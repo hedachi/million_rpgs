@@ -1,9 +1,9 @@
-const GameGenerator = require("./generator/game_generator");
-const GameDetailGenerator = require("./generator/game_detail_generator");
+const GameGenerator = require("../generator/game_generator");
+const GameDetailGenerator = require("../generator/game_detail_generator");
 const LLM = require("./llm");
-const Prompt = require('./prompt');
+const Prompt = require('../prompt');
 const AWS = require('aws-sdk');
-const TextUtils = require('./text_utils');
+const TextUtils = require('../text_utils');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 

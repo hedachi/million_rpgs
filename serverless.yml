@@ -35,35 +35,35 @@ provider:
 
 functions:
   index:
-    handler: index.handler
+    handler: src/index.handler
     events:
       - http:
           path: index
           method: get
           cors: true
   getGame:
-    handler: get_game.handler
+    handler: src/get_game.handler
     events:
       - http:
           path: get_game
           method: get
           cors: true
   execute_ai:
-    handler: execute_ai.handler
+    handler: src/execute_ai.handler
     events:
       - http:
           path: execute_ai
           method: post
           cors: true
   generate_game_contents:
-    handler: generate_game_contents.handler
+    handler: src/generate_game_contents.handler
     events:
       - http:
           path: generate_game_contents
           method: get
           cors: true
   get_next_or_prev_game:
-    handler: get_next_or_prev_game.handler
+    handler: src/get_next_or_prev_game.handler
     events:
       - http:
           path: get_next_or_prev_game
@@ -109,15 +109,3 @@ custom:
     basePath: ""  # APIのベースパス; 必要なければ空にしておく
     stage: ${self:provider.stage}
     createRoute53Record: true
-
-# custom:
-#   dynamodb:
-#     stages:
-#       - dev
-#     start:
-#       port: 8000
-#       inMemory: true
-#       migrate: true
-#       accessKeyId: fakeMyKeyId
-#       secretAccessKey: fakeSecretAccessKey
-#     noStart: true
