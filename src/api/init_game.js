@@ -17,13 +17,11 @@ async function delay(ms) {
 // }
 
 module.exports.handler = async (event) => {
-  console.log("### START index.js ###");
-
   const rpgPrompt = event?.queryStringParameters?.prompt;
 
   const isOffline = !!process.env.IS_OFFLINE;
   const functionUrl = isOffline ?
-    'http://localhost:3000/dev/execute_ai' :
+    'http://localhost:3000/dev/start_game' :
     'https://lhpnlnb3f6.execute-api.ap-northeast-1.amazonaws.com/dev/execute_ai';
 
   const gameIds = [];
@@ -66,8 +64,6 @@ module.exports.handler = async (event) => {
     console.error("Error executing AI:", error);
     throw error;
   }
-
-  console.log("### END index.js ###");
   return {
     statusCode: 200,
     headers: {

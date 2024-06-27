@@ -5,7 +5,6 @@ const Prompt = require('../prompt');
 
 
 module.exports.handler = async (event) => {
-  console.log("### START execute_ai.js ###");
   const queryParams = JSON.parse(event.body);
 
   const userPrompt = queryParams.prompt;
@@ -22,7 +21,6 @@ module.exports.handler = async (event) => {
   const gameDetail = {};
   await gameDetailGenerator.generateAndSaveViaStream(gameDetail, gameStartPrompt);
 
-  console.log("### END execute_ai.js ###");
   return {
     statusCode: 200,
     body: JSON.stringify({

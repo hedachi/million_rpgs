@@ -8,7 +8,6 @@ require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.handler = async (event) => {
-  console.log("### START generate_game_contents.js ###");
   const queryParams = event.queryStringParameters;
   const gameId = parseInt(queryParams.gameId);
   const scriptIndex = parseInt(queryParams.scriptIndex) || 0;

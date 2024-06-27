@@ -35,10 +35,10 @@ provider:
 
 functions:
   index:
-    handler: src/api/index.handler
+    handler: src/api/init_game.handler
     events:
       - http:
-          path: index
+          path: init_game
           method: get
           cors: true
   getGame:
@@ -49,24 +49,24 @@ functions:
           method: get
           cors: true
   execute_ai:
-    handler: src/api/execute_ai.handler
+    handler: src/api/start_game.handler
     events:
       - http:
-          path: execute_ai
+          path: start_game
           method: post
           cors: true
   generate_game_contents:
-    handler: src/api/generate_game_contents.handler
+    handler: src/api/play_game.handler
     events:
       - http:
-          path: generate_game_contents
+          path: play_game
           method: get
           cors: true
   get_next_or_prev_game:
-    handler: src/api/get_next_or_prev_game.handler
+    handler: src/api/debug_get_next_or_prev_game.handler
     events:
       - http:
-          path: get_next_or_prev_game
+          path: debug_get_next_or_prev_game
           method: get
           cors: true
 
