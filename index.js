@@ -19,9 +19,7 @@ async function delay(ms) {
 module.exports.handler = async (event) => {
   console.log("### START index.js ###");
 
-  const rpgPrompt =
-    event?.queryStringParameters?.prompt || 
-    "戦国、SF、古代ローマ、異世界転生、アフリカ、人魚、ロボット、その他数百ものインパクトある要素が登場！";
+  const rpgPrompt = event?.queryStringParameters?.prompt;
 
   const isOffline = !!process.env.IS_OFFLINE;
   const functionUrl = isOffline ?
