@@ -1,0 +1,123 @@
+org: hedachi
+app: million-rpgs2
+service: million-rpgs2
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-northeast-1
+  stage: dev
+  environment:
+    ANTHROPIC_API_KEY: ${env:ANTHROPIC_API_KEY}
+  timeout: 180
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+          Resource:
+            - arn:aws:dynamodb:ap-northeast-1:831431380716:table/RPG_GameDetails
+            - arn:aws:dynamodb:ap-northeast-1:831431380716:table/RPG_Games
+            - arn:aws:dynamodb:ap-northeast-1:831431380716:table/RPG_GameGenLogs
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - arn:aws:s3:::million-rpg/*
+
+functions:
+  index:
+    handler: index.handler
+    events:
+      - http:
+          path: index
+          method: get
+          cors: true
+  getGame:
+    handler: get_game.handler
+    events:
+      - http:
+          path: get_game
+          method: get
+          cors: true
+  execute_ai:
+    handler: execute_ai.handler
+    events:
+      - http:
+          path: execute_ai
+          method: post
+          cors: true
+  generate_game_contents:
+    handler: generate_game_contents.handler
+    events:
+      - http:
+          path: generate_game_contents
+          method: get
+          cors: true
+  get_next_or_prev_game:
+    handler: get_next_or_prev_game.handler
+    events:
+      - http:
+          path: get_next_or_prev_game
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    GamesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RPG_Games
+        AttributeDefinitions:
+          - AttributeName: gameId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: gameId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    GameDetailsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RPG_GameDetails
+        AttributeDefinitions:
+          - AttributeName: gameId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: gameId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+package:
+  individually: true
+
+plugins:
+  - serverless-offline
+  # - serverless-dynamodb
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: "api.rpg.vivle.jp"
+    basePath: ""  # APIのベースパス; 必要なければ空にしておく
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+
+# custom:
+#   dynamodb:
+#     stages:
+#       - dev
+#     start:
+#       port: 8000
+#       inMemory: true
+#       migrate: true
+#       accessKeyId: fakeMyKeyId
+#       secretAccessKey: fakeSecretAccessKey
+#     noStart: true

@@ -1,0 +1,24 @@
+{
+  "name": "million-rpgs2",
+  "version": "1.0.0",
+  "description": "<!-- title: 'AWS Simple HTTP Endpoint example in NodeJS' description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.' layout: Doc framework: v3 platform: AWS language: nodeJS authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.6",
+    "aws-sdk": "^2.1116.0",
+    "axios": "^1.6.8",
+    "serverless-dynamodb": "^0.2.51"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "serverless-domain-manager": "^7.3.8",
+    "serverless-dynamodb-local": "^0.1.1",
+    "serverless-offline": "^13.3.3"
+  }
+}
