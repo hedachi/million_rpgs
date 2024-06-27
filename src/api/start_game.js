@@ -1,5 +1,5 @@
-const GameGenerator = require("../generator/game_generator");
-const GameDetailGenerator = require("../generator/game_detail_generator");
+const DynamoDB = require("../db/dynamo_db");
+const GameDetailUtil = require("../db/game_detail_util");
 const LLM = require("../llm");
 const Prompt = require('../prompt');
 
@@ -9,17 +9,21 @@ module.exports.handler = async (event) => {
 
   const userPrompt = queryParams.prompt;
   const gameId = parseInt(queryParams.gameId);
+  const language = queryParams.language;
 
-  const gameGenerator = new GameGenerator(gameId, userPrompt);
-  gameGenerator.prepare();
-  await gameGenerator.save(gameGenerator.getSaveParams());
-
-  const gameDetailGenerator = new GameDetailGenerator(gameId, userPrompt)
-  gameDetailGenerator.prepare();
+  await DynamoDB.save("Games", {
+    gameId: gameId,
+    prompt: userPrompt,
+    language: language,
+  });
 
   const gameStartPrompt = Prompt.gameStartPrompt(userPrompt);
-  const gameDetail = {};
-  await gameDetailGenerator.generateAndSaveViaStream(gameDetail, gameStartPrompt);
+  const gameDetail = {
+    gameId: gameId,
+    stories: [],
+    playerActions: [],
+  };
+  await GameDetailUtil.generateAndSaveViaStream(gameDetail, gameStartPrompt);
 
   return {
     statusCode: 200,

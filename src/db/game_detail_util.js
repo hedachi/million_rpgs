@@ -1,16 +1,10 @@
-const AbstractGenerator = require('./abstract_generator');
+const DynamoDB = require('./dynamo_db');
 const LLM = require("../llm");
 const fs = require('fs');
 const path = require('path');
 
-class GameDetailGenerator extends AbstractGenerator {
-  tableName = "GameDetails";
-
-  getPrompt() {
-    return ;
-  }
-
-  async generateAndSaveViaStream(gameDetail, prompt) {
+class GameDetailUtil {
+  static async generateAndSaveViaStream(gameDetail, prompt) {
     const mainAiModel = LLM.CLAUDE_BEST_MODEL;
     let response = "";
     let lastSavedResponseBreakLength = 0;
@@ -36,21 +30,15 @@ class GameDetailGenerator extends AbstractGenerator {
         response = response.slice(0, lastIndex);
         let removedPart = originalResponse.slice(lastIndex + 1);
         gameDetail.stories[nextStoryIndex] = response;
-        this.save(gameDetail);
+        DynamoDB.save("GameDetails", gameDetail);
         lastSavedResponseBreakLength = responseBreakLength;
         response += "\n"+ removedPart;
       }
     });
     gameDetail.stories[nextStoryIndex] = response;
     gameDetail.generateFinished = true;
-    await this.save(gameDetail);
-  }
-
-  getSaveParams(content) {
-    return {
-      content: content
-    }
+    await DynamoDB.save("GameDetails", gameDetail);
   }
 }
 
-module.exports = GameDetailGenerator;
+module.exports = GameDetailUtil;

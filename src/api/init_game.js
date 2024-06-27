@@ -18,6 +18,7 @@ async function delay(ms) {
 
 module.exports.handler = async (event) => {
   const rpgPrompt = event?.queryStringParameters?.prompt;
+  const language = event?.queryStringParameters?.language;
 
   const isOffline = !!process.env.IS_OFFLINE;
   const functionUrl = isOffline ?
@@ -36,7 +37,8 @@ module.exports.handler = async (event) => {
       gameIds.push(gameId);
       query = {
         "prompt": `${rpgPrompt}`,
-        "gameId": `${gameId}`
+        "gameId": `${gameId}`,
+        "language":`${language}`
       };
       axios.post(functionUrl, query)
         .then(response => {
