@@ -21,6 +21,7 @@ class GameDetailUtil {
       const logFileName = `../logs/${this.gameId}.txt`;
       const filePath = path.join(__dirname, '..', 'logs', logFileName);
       console.log("filePath: " + filePath);
+    }
     
     await LLM.generate(this.gameId, prompt, mainAiModel, (text) => {
       if (saveLogsToFile) {
