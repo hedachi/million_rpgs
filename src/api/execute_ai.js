@@ -1,7 +1,7 @@
-const GameGenerator = require("./generator/game_generator");
-const GameDetailGenerator = require("./generator/game_detail_generator");
-const LLM = require("./llm");
-const Prompt = require('./prompt');
+const GameGenerator = require("../generator/game_generator");
+const GameDetailGenerator = require("../generator/game_detail_generator");
+const LLM = require("../llm");
+const Prompt = require('../prompt');
 
 
 module.exports.handler = async (event) => {

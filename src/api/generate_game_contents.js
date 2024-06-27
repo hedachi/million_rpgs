@@ -1,6 +1,6 @@
 const GameGenerator = require("../generator/game_generator");
 const GameDetailGenerator = require("../generator/game_detail_generator");
-const LLM = require("./llm");
+const LLM = require("../llm");
 const Prompt = require('../prompt');
 const AWS = require('aws-sdk');
 const TextUtils = require('../text_utils');
