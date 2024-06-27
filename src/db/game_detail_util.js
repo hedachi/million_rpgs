@@ -1,7 +1,12 @@
 const DynamoDB = require('./dynamo_db');
 const LLM = require("../llm");
-const fs = require('fs');
-const path = require('path');
+
+const saveLogsToFile = false;
+
+if (saveLogsToFile) {
+  const fs = require('fs');
+  const path = require('path');
+}
 
 class GameDetailUtil {
   static async generateAndSaveViaStream(gameDetail, prompt) {
@@ -12,16 +17,20 @@ class GameDetailUtil {
       gameDetail.stories = [];
     }
     const nextStoryIndex = gameDetail.stories.length;
-    // const logFileName = `../logs/${this.gameId}.txt`;
-    // const filePath = path.join(__dirname, '..', 'logs', logFileName);
-    // console.log("filePath: " + filePath);
+    if (saveLogsToFile) {
+      const logFileName = `../logs/${this.gameId}.txt`;
+      const filePath = path.join(__dirname, '..', 'logs', logFileName);
+      console.log("filePath: " + filePath);
+    
     await LLM.generate(this.gameId, prompt, mainAiModel, (text) => {
-      // console.log("+" + text);
-      // fs.appendFileSync(filePath, `${text}|`, (err) => {
-      //   if (err) {
-      //     console.error('ファイルへの追記に失敗しました:', err);
-      //   }
-      // });
+      if (saveLogsToFile) {
+        console.log("+" + text);
+        fs.appendFileSync(filePath, `${text}|`, (err) => {
+          if (err) {
+            console.error('ファイルへの追記に失敗しました:', err);
+          }
+        });
+      }
       response += text;
       const responseBreakLength = response.match(/\n/g)?.length || 0;
       if (lastSavedResponseBreakLength != responseBreakLength && responseBreakLength % 3 == 0) {
