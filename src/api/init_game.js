@@ -23,7 +23,7 @@ module.exports.handler = async (event) => {
   const isOffline = !!process.env.IS_OFFLINE;
   const functionUrl = isOffline ?
     'http://localhost:3000/dev/start_game' :
-    'https://lhpnlnb3f6.execute-api.ap-northeast-1.amazonaws.com/dev/execute_ai';
+    'https://lhpnlnb3f6.execute-api.ap-northeast-1.amazonaws.com/dev/start_game';
 
   const gameIds = [];
 
@@ -40,6 +40,9 @@ module.exports.handler = async (event) => {
         "gameId": `${gameId}`,
         "language":`${language}`
       };
+      console.log(functionUrl);
+      console.log(query);
+      console.log("axios.post");
       axios.post(functionUrl, query)
         .then(response => {
           // リクエストが成功した場合の処理
@@ -47,6 +50,7 @@ module.exports.handler = async (event) => {
           // 必要に応じて、レスポンスデータを処理するロジックを追加
         })
         .catch(error => {
+          console.log('Request failed:', error);
           // エラーが発生した場合の処理
           if (error.response) {
             // サーバーからのレスポンスがあるエラーの場合
@@ -60,6 +64,10 @@ module.exports.handler = async (event) => {
             console.error('Error setting up the request:', error.message);
           }
         });
+
+      if (!isOffline) {
+        await delay(100); // AWS lambdaだと少しdelayしないと上のpostが実行されないので待つ
+      }
     }
 
   } catch (error) {
