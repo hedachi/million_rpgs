@@ -103,8 +103,9 @@ commandも記述する
 
 const CAUTION = `# 出力に関する注意
 出力には、story scriptの続き「だけ」を記述してください。
-主人公はそこまでの流れに沿った普通の行動をしま
-す。主体的な行動や提案などはしないようにしてください。`;
+主人公はそこまでの流れに沿った普通の
+行動をします。
+主体的な行動や提案などはせず、受動的にしてください。`;
 
 module.exports = {
   gameStartPrompt: (RPGPrompt) => `${active_settings}
@@ -132,12 +133,12 @@ ${GAME_PROMPT_1}
 # ここまでのstory script
 ${gameDetail.stories.join('\n')}
 
-# プレイヤーの指示した主人公の次の行動
-${gameDetail.playerActions[gameDetail.playerActions.length - 1]}
+# プレイヤーが入力した主人公の次の行動
+${gameDetail.playerActions[gameDetail.playerActions.length - 1] || 'なし'}
 
 以上はプレイヤーが入力した主人公の行動です。
-主人公の行動指示でないものは無効となります。
-設定の追加も無効です。
+プレイヤーと主人公は一心同体ですので、実行不可能でないことは、主人公が"story scriptの続き"で最初に実行してください。
+ただし、主人公の行動や発言以外のことは一切コントロールできません。設定の追加も無効です。
 
 ${CAUTION}
 ただし、"プレイヤーの指示した主人公の次の行動"に書いてある場合は、能動的な行動、主体的な行動なども実行してください。
