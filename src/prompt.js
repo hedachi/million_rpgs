@@ -82,9 +82,9 @@ partnerの画像を表示
 一文は常に短く
 主人公の一人称視点
 改行を連続しない
-commandも記述する
+commandも記述する`;
 
-# story scriptの出力例
+const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例
 僕は、突然目が覚めると、見知らぬ場所にいた。
 僕「あれ、ここは・・・？」
 メリッサ「静かに…！ドラゴンがそこで寝てるわ」
@@ -102,21 +102,44 @@ commandも記述する
 [damage:partner,high]
 [partner:injured]`;
 
+const STORY_SCRIPT_EXAMPLE_EN = `# story scriptの出力例
+I suddenly woke up to find myself in an unfamiliar place.
+Me: "Huh, where is this...?"
+Melissa: "Be quiet...! There's a dragon sleeping over there."
+[show:101]
+Me: "Whoa!?"
+I shouted loudly, waking up the dragon.
+Melissa: "Damn, we have no choice but to fight!"
+[partner:attacking]
+[effect:slash]
+[show:101]
+[damage:101,low]
+The dragon, enraged, breathed fire at Melissa!
+[effect:fire]
+Melissa: "Ah!"
+[damage:partner,high]
+[partner:injured]`;
+
 const CAUTION = `# 出力に関する注意
 出力には、story scriptの続き「だけ」を記述してください。
 主人公はそこまでの流れに沿った普通の行動をします。
 主人公はあまり賢くないので、主体的な行動や提案などは一切せず、受動的に行動します。`;
 
-const gameStartPrompt = (RPGPrompt) => `${active_settings}
+const gameStartPrompt = (gameDetail) => `${active_settings}
 
 # ユーザーの追加要望
-${RPGPrompt}
+${gameDetail.userPrompt}
 
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 ${GAME_PROMPT_1}
 
+${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+
 ${CAUTION}
+
+# story scriptの言語設定
+${gameDetail.language}
 
 # story script
 `;
@@ -129,6 +152,8 @@ ${gameDetail.userPrompt}
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 ${GAME_PROMPT_1}
+
+${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
 # ここまでのstory script
 ${gameDetail.stories.join('\n')}
@@ -145,6 +170,9 @@ ${CAUTION}
 ゴーレムには遠距離攻撃をすると大ダメージ（damage: high）を与えられます。
 敵も味方もダメージは受けますが、それによって倒れることは絶対にありません。
 
+# story scriptの言語設定
+${gameDetail.language}
+
 # story scriptの続き
 `;
 
@@ -158,10 +186,15 @@ ${gameDetail.userPrompt}
 
 ${GAME_PROMPT_1}
 
+${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+
 # ここまでのstory script
 ${gameDetail.stories.join('\n')}
 
 ${CAUTION}
+
+# story scriptの言語設定
+${gameDetail.language}
 
 # ゲーム終了の理由
 ${gameEndReason}

@@ -17,12 +17,14 @@ module.exports.handler = async (event) => {
     language: language,
   });
 
-  const gameStartPrompt = Prompt.gameStartPrompt(userPrompt);
   const gameDetail = {
     gameId: gameId,
+    language: language,
     stories: [],
     playerActions: [],
+    userPrompt: userPrompt,
   };
+  const gameStartPrompt = Prompt.gameStartPrompt(gameDetail);
   await GameDetailUtil.generateAndSaveViaStream(gameDetail, gameStartPrompt);
 
   return {
