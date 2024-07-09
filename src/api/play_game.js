@@ -12,6 +12,7 @@ module.exports.handler = async (event) => {
   const gameId = parseInt(queryParams.gameId);
   const scriptIndex = parseInt(queryParams.scriptIndex) || 0;
   const playerAction = queryParams.playerAction;
+  const gameEndReason = queryParams.gameEndReason;
 
   const params = {
     TableName: 'RPG_GameDetails', // 使用するテーブル名
@@ -33,8 +34,14 @@ module.exports.handler = async (event) => {
   gameDetail.stories[gameDetail.stories.length - 1] = script;
   await DynamoDB.save("GameDetails", gameDetail);
   
-  const progressWithPlayerAction = Prompt.progressWithPlayerAction(gameDetail, playerAction);
-  await GameDetailUtil.generateAndSaveViaStream(gameDetail, progressWithPlayerAction);
+  if (gameEndReason) {
+    const progressWithGameEndReason = Prompt.scriptToGameEnd(gameDetail, gameEndReason);
+    await GameDetailUtil.generateAndSaveViaStream(gameDetail, progressWithGameEndReason);
+  }
+  else {
+    const progressWithPlayerAction = Prompt.progressWithPlayerAction(gameDetail, playerAction);
+    await GameDetailUtil.generateAndSaveViaStream(gameDetail, progressWithPlayerAction);
+  }
 
   return {
     statusCode: 200,
