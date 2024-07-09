@@ -40,7 +40,7 @@ class GameDetailUtil {
         response = response.slice(0, lastIndex);
         let removedPart = originalResponse.slice(lastIndex + 1);
         gameDetail.stories[nextStoryIndex] = response;
-        DynamoDB.save("GameDetails", gameDetail);
+        DynamoDB.save("GameDetails", gameDetail, true);
         lastSavedResponseBreakLength = responseBreakLength;
         response += "\n"+ removedPart;
       }

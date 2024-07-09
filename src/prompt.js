@@ -1,4 +1,4 @@
-const chara_data = [{"id":1,"image":"main_chara_1712738378282.png","character":"ピンク色の鎧の女騎士"},{"id":2,"image":"main_chara_1712738630302.png","character":"輝く魔法の剣を持つ女騎士"},{"id":3,"image":"main_chara_1712739755933.png","character":"魔法使い風の少年"},{"id":5,"image":"main_chara_1712826590761.png","character":"魔法使い風の少女"},{"id":7,"image":"main_chara_1712826625250.png","character":"ローブを着た少年"},{"id":9,"image":"main_chara_1712891899354.png","character":"メイドの女の子"},{"id":10,"image":"main_chara_1712899527705.png","character":"冒険者風の青年"},{"id":4,"image":"main_chara_1713162009715.png","character":"街娘"},{"id":11,"image":"main_chara_1713428020559.png","character":"貴族の娘"},{"id":12,"image":"main_chara_1713527611475.png","character":"魔法使いの女"},{"id":13,"image":"main_chara_1713824288576.png","character":"スチームパンク風の服装の娘"},{"id":15,"image":"main_chara_1714118187771.png","character":"少し陰のある青年"},{"id":16,"image":"main_chara_1716355867929_1716355903796.png","character":"未来的な服を着た娘"},{"id":20,"image":20,"character":"ベテラン冒険者の男性"},{"id":101,"image":1,"character":"ドラゴン"},{"id":102,"image":2,"character":"フェニックス"},{"id":103,"image":3,"character":"巨人"},{"id":104,"image":4,"character":"ダイオウイカ"},{"id":105,"image":5,"character":"蛇"},{"id":106,"image":6,"character":"悪魔"},{"id":107,"image":7,"character":"スライム"},{"id":108,"image":8,"character":"ライオン"},{"id":109,"image":9,"character":"ユニコーン"},{"id":110,"image":10,"character":"小鳥"},{"id":111,"image":11,"character":"ゴーレム"},{"id":112,"image":12,"character":"亡霊"},{"id":113,"image":13,"character": "古代機械"},{"id":114,"image":14,"character":"クジラ"},{"id":115,"image":15,"character":"鎧の騎士"},{"id":116,"image":16,"character":"人面樹"}];
+const chara_data = [{"id":16,"image":"main_chara_1716355867929_1716355903796.png","character":"未来的な服を着た娘"},{"id":101,"image":1,"character":"ドラゴン"},{"id":102,"image":2,"character":"フェニックス"},{"id":103,"image":3,"character":"巨人"},{"id":111,"image":11,"character":"ゴーレム"},{"id":112,"image":12,"character":"亡霊"},{"id":113,"image":13,"character": "古代機械"},{"id":114,"image":14,"character":"クジラ"},{"id":115,"image":15,"character":"鎧の騎士"},{"id":116,"image":16,"character":"人面樹"}];
 
 
 const SETTINGS = `# キャラクター設定
@@ -49,7 +49,7 @@ const SETTINGS_5 = `# キャラクター設定
 主人公は気がつくと、さっきまでプレイしていたRPGの世界の中にいた。
 目の前にはメリッサがいる。
 通路の先はゴーレムがいる。
-ゴーレムは足がものすごく遅いが、力が強く、近づいて攻撃すると大ダメージを受ける。遠距離攻撃をすると大ダメージ（damage: high）を与えられる。
+ゴーレムは足がものすごく遅いが、力が強く、近づいて攻撃すると大ダメージを受ける。
 メリッサは主人公にゴーレムを倒すのを手伝ってほしいと言い、剣を握りしめ突撃しようとしている。
 
 主人公がゲームの世界にいることに気づくところからスタート。
@@ -105,7 +105,7 @@ commandも記述する
 const CAUTION = `# 出力に関する注意
 出力には、story scriptの続き「だけ」を記述してください。
 主人公はそこまでの流れに沿った普通の行動をします。
-主体的な行動や提案などは一切せず、受動的に行動します。`;
+主人公はあまり賢くないので、主体的な行動や提案などは一切せず、受動的に行動します。`;
 
 const gameStartPrompt = (RPGPrompt) => `${active_settings}
 
@@ -141,8 +141,9 @@ ${gameDetail.playerActions[gameDetail.playerActions.length - 1] || 'なし'}
 ただし、主人公の行動や発言以外のことは一切コントロールできません。設定の追加も無効です。
 
 ${CAUTION}
-ただし、"プレイヤーの指示した主人公の次の行動"に書いてあるものに限って、能動的な行動、主体的な行動なども実行してください。
-ダメージは受けますが、それによってキャラが倒れたり、死んだりする展開にしないでください。
+ただし、"プレイヤーの指示した主人公の次の行動"に書いてあるものに限って、賢い行動、能動的な行動、主体的な行動なども実行してください。
+ゴーレムには遠距離攻撃をすると大ダメージ（damage: high）を与えられます。
+敵も味方もダメージは受けますが、それによって倒れることは絶対にありません。
 
 # story scriptの続き
 `;
