@@ -55,6 +55,19 @@ const SETTINGS_5 = `# キャラクター設定
 主人公がゲームの世界にいることに気づくところからスタート。
 `;
 
+const SETTINGS_6 = `# キャラクター設定
+主人公: RPGをプレイしていたら、突然ゲームの中に転生してしまった男性。
+メリッサ: 銀色の鎧をまとった金髪の女傭兵。剣と弓矢を持っている。力任せで戦略性がない。
+
+# ストーリー設定
+主人公は気がつくと、さっきまでプレイしていたRPGの世界の中にいた。
+目の前にはメリッサがいる。
+通路の先はゴーレムがいる。
+ゴーレムは足がものすごく遅いが、力が強く、近づいて攻撃すると大ダメージを受ける。
+メリッサは主人公にゴーレムを倒すのを手伝ってほしいと言い、剣を握りしめ突撃しようとしている。
+
+主人公がゲームの世界にいることに気づくところからスタート。
+`;
 
 const active_settings = SETTINGS_5;
 
@@ -103,18 +116,18 @@ const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例
 [partner:injured]`;
 
 const STORY_SCRIPT_EXAMPLE_EN = `# story scriptの出力例
-I suddenly woke up to find myself in an unfamiliar place.
-Me: "Huh, where is this...?"
-Melissa: "Be quiet...! There's a dragon sleeping over there."
+I woke up in a strange place.
+Me: "Where am I?"
+Melissa: "Quiet! A dragon's sleeping there."
 [show:101]
-Me: "Whoa!?"
-I shouted loudly, waking up the dragon.
-Melissa: "Damn, we have no choice but to fight!"
+Me: "What!?"
+My shout wakes the dragon.
+Melissa: "No choice but to fight!"
 [partner:attacking]
 [effect:slash]
 [show:101]
 [damage:101,low]
-The dragon, enraged, breathed fire at Melissa!
+The dragon breathes fire at Melissa!
 [effect:fire]
 Melissa: "Ah!"
 [damage:partner,high]
