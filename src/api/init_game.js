@@ -22,8 +22,9 @@ module.exports.handler = async (event) => {
 
   const isOffline = !!process.env.IS_OFFLINE;
   const functionUrl = isOffline ?
-    'http://localhost:3000/dev/start_game' :
-    'https://lhpnlnb3f6.execute-api.ap-northeast-1.amazonaws.com/dev/start_game';
+  `http://localhost:3000/${process.env.STAGE}/start_game` :
+  // 'https://lhpnlnb3f6.execute-api.ap-northeast-1.amazonaws.com/dev/start_game';
+  'https://3loeqbijyg.execute-api.ap-northeast-1.amazonaws.com/staging/start_game';
 
   const gameIds = [];
 

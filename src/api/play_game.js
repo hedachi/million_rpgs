@@ -15,7 +15,7 @@ module.exports.handler = async (event) => {
   const gameEndReason = queryParams.gameEndReason;
 
   const params = {
-    TableName: 'RPG_GameDetails', // 使用するテーブル名
+    TableName: `RPG_GameDetails-${process.env.STAGE}`, //
     Key: {
       gameId: gameId, // 取得したいアイテムのキー
     },

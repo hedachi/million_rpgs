@@ -9,7 +9,7 @@ module.exports.handler = async (event) => {
 
     // getメソッドのパラメータを設定
     const params = {
-      TableName: 'RPG_GameDetails', // 使用するテーブル名
+      TableName: `RPG_GameDetails-${process.env.STAGE}`, // 使用するテーブル名
       Key: {
         gameId: gameId, // 取得したいアイテムのキー
       },

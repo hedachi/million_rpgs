@@ -5,7 +5,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 class DynamoDB {
   static async save(tableName, saveParams, noLog = false) {
     const params = {
-      TableName: `RPG_${tableName}`,
+      TableName: `RPG_${tableName}-${process.env.STAGE}`,
       Item: saveParams,
     };
 
