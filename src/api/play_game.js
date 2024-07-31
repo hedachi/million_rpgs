@@ -1,7 +1,7 @@
 const DynamoDB = require("../db/dynamo_db");
 const GameDetailUtil = require("../db/game_detail_util");
 const LLM = require("../llm");
-const Prompt = require('../prompt');
+const Prompt = require('../prompt_mystery');
 const AWS = require('aws-sdk');
 const TextUtils = require('../text_utils');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;

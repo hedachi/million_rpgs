@@ -1,7 +1,7 @@
 const DynamoDB = require("../db/dynamo_db");
 const GameDetailUtil = require("../db/game_detail_util");
 const LLM = require("../llm");
-const Prompt = require('../prompt');
+const Prompt = require('../prompt_mystery');
 
 
 module.exports.handler = async (event) => {
