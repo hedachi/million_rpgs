@@ -55,21 +55,9 @@ const SETTINGS_5 = `# キャラクター設定
 主人公がゲームの世界にいることに気づくところからスタート。
 `;
 
-const SETTINGS_6 = `# キャラクター設定
-主人公: RPGをプレイしていたら、突然ゲームの中に転生してしまった男性。
-メリッサ: 銀色の鎧をまとった金髪の女傭兵。剣と弓矢を持っている。力任せで戦略性がない。
+const SETTINGS_6 = `story scriptを出力してください。出力の例としては下記を参考にしてください。`;
 
-# ストーリー設定
-主人公は気がつくと、さっきまでプレイしていたRPGの世界の中にいた。
-目の前にはメリッサがいる。
-通路の先はゴーレムがいる。
-ゴーレムは足がものすごく遅いが、力が強く、近づいて攻撃すると大ダメージを受ける。
-メリッサは主人公にゴーレムを倒すのを手伝ってほしいと言い、剣を握りしめ突撃しようとしている。
-
-主人公がゲームの世界にいることに気づくところからスタート。
-`;
-
-const active_settings = SETTINGS_5;
+const active_settings = SETTINGS_6;
 
 const GAME_PROMPT_1 = `# 使用可能キャラクターのidと特徴
 ${
@@ -140,14 +128,14 @@ const CAUTION = `# 出力に関する注意
 
 const gameStartPrompt = (gameDetail) => `${active_settings}
 
+${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+
 # ユーザーの追加要望
 ${gameDetail.userPrompt}
 
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 ${GAME_PROMPT_1}
-
-${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
 ${CAUTION}
 
@@ -159,14 +147,14 @@ ${gameDetail.language}
 
 const progressWithPlayerAction = (gameDetail) => `${active_settings}
 
+${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+
 # ユーザーの追加要望
 ${gameDetail.userPrompt}
 
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 ${GAME_PROMPT_1}
-
-${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
 # ここまでのstory script
 ${gameDetail.stories.join('\n')}
