@@ -49,6 +49,13 @@ functions:
           path: get_game
           method: get
           cors: true
+  get_game_list:
+    handler: src/api/get_game_list.handler
+    events:
+      - http:
+          path: get_game_list
+          method: get
+          cors: true
   start_game:
     handler: src/api/start_game.handler
     events:
@@ -93,6 +100,17 @@ resources:
             AttributeType: N
         KeySchema:
           - AttributeName: gameId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    GamePlayTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RPG_GamePlayLogs-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: gamePlayLogId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: gamePlayLogId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
