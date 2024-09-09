@@ -1,15 +1,15 @@
 // // game_detail_generator.test.js
 // const fs = require('fs');
 // const path = require('path');
-// const GameDetailUtil = require('../db/game_detail_util');
+// const GamePlayLogGenerator = require('../db/game_detail_util');
 // const LLM = require('../llm');
 
 // jest.mock('fs'); // fsモジュールをモック
 // jest.mock('../llm'); // LLMモジュールをモック
 
-// describe('GameDetailUtil', () => {
+// describe('GamePlayLogGenerator', () => {
 //   beforeEach(() => {
-//     GameDetailUtil.save = (gameDetail) => {
+//     GamePlayLogGenerator.save = (gameDetail) => {
 //       console.log(gameDetail);
 //       generator.gameDetail = gameDetail;
 //     };

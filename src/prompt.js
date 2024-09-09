@@ -126,12 +126,12 @@ const CAUTION = `# 出力に関する注意
 主人公はそこまでの流れに沿った普通の行動をします。
 主人公はあまり賢くないので、主体的な行動や提案などは一切せず、受動的に行動します。`;
 
-const gameStartPrompt = (gameDetail) => `${active_settings}
+const gameStartPrompt = (game) => `${active_settings}
 
-${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+${game.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
 # ユーザーの追加要望
-${gameDetail.userPrompt}
+${game.prompt}
 
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
@@ -140,27 +140,27 @@ ${GAME_PROMPT_1}
 ${CAUTION}
 
 # story scriptの言語設定
-${gameDetail.language}
+${game.language}
 
 # story script
 `;
 
-const progressWithPlayerAction = (gameDetail) => `${active_settings}
+const progressWithPlayerAction = (gamePlayLog) => `${active_settings}
 
-${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+${gamePlayLog.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
 # ユーザーの追加要望
-${gameDetail.userPrompt}
+${gamePlayLog.userPrompt}
 
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 ${GAME_PROMPT_1}
 
 # ここまでのstory script
-${gameDetail.stories.join('\n')}
+${gamePlayLog.stories.join('\n')}
 
 # プレイヤーが入力した主人公の次の行動
-${gameDetail.playerActions[gameDetail.playerActions.length - 1] || 'なし'}
+${gamePlayLog.playerActions[gamePlayLog.playerActions.length - 1] || 'なし'}
 
 以上はプレイヤーが入力した主人公の行動です。
 プレイヤーと主人公は一心同体ですので、実行不可能でないことは、主人公が"story scriptの続き"で最初に実行してください。
@@ -172,30 +172,30 @@ ${CAUTION}
 敵も味方もダメージは受けますが、それによって倒れることは絶対にありません。
 
 # story scriptの言語設定
-${gameDetail.language}
+${gamePlayLog.language}
 
 # story scriptの続き
 `;
 
 
-const scriptToGameEnd = (gameDetail, gameEndReason) => `${active_settings}
+const scriptToGameEnd = (gamePlayLog, gameEndReason) => `${active_settings}
 
 # ユーザーの追加要望
-${gameDetail.userPrompt}
+${gamePlayLog.userPrompt}
 
 以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 ${GAME_PROMPT_1}
 
-${gameDetail.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+${gamePlayLog.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
 # ここまでのstory script
-${gameDetail.stories.join('\n')}
+${gamePlayLog.stories.join('\n')}
 
 ${CAUTION}
 
 # story scriptの言語設定
-${gameDetail.language}
+${gamePlayLog.language}
 
 # ゲーム終了の理由
 ${gameEndReason}

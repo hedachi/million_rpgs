@@ -5,13 +5,28 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 module.exports.handler = async (event) => {
   try {
     const queryParams = event.queryStringParameters;
-    const gameId = parseInt(queryParams.gameId);
+
+    if (!queryParams.gamePlayLogId) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Origin": '*',
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+        },
+        body: JSON.stringify({
+          error: "gamePlayLogIdがありません！！！",
+        }),
+      };
+    }
+
+    const gamePlayLogId = parseInt(queryParams.gamePlayLogId);
 
     // getメソッドのパラメータを設定
     const params = {
-      TableName: `RPG_GameDetails-${process.env.STAGE}`, // 使用するテーブル名
+      TableName: `RPG_GamePlayLogs-${process.env.STAGE}`, // 使用するテーブル名
       Key: {
-        gameId: gameId, // 取得したいアイテムのキー
+        gamePlayLogId: gamePlayLogId, // 取得したいアイテムのキー
       },
     };
 
@@ -28,7 +43,7 @@ module.exports.handler = async (event) => {
         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
       },
       body: JSON.stringify({
-        gameDetails: data.Item,
+        gamePlayLog: data.Item,
       }),
     };
   }

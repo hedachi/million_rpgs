@@ -1,5 +1,5 @@
 const DynamoDB = require("../db/dynamo_db");
-const GameDetailUtil = require("../db/game_detail_util");
+const GamePlayLogGenerator = require("../db/game_play_log_generator");
 const LLM = require("../llm");
 const Prompt = require('../prompt');
 const AWS = require('aws-sdk');
@@ -10,37 +10,61 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 module.exports.handler = async (event) => {
   const queryParams = event.queryStringParameters;
   const gameId = parseInt(queryParams.gameId);
+  let gamePlayLogId = parseInt(queryParams.gamePlayLogId) || null;
   const scriptIndex = parseInt(queryParams.scriptIndex) || 0;
   const playerAction = queryParams.playerAction;
   const gameEndReason = queryParams.gameEndReason;
 
+  if (gamePlayLogId == null) {
+    const params = {
+      TableName: `RPG_Games-${process.env.STAGE}`,
+      Key: {
+        gameId: gameId,
+      },
+    };
+    const game = await dynamodb.get(params).promise();
+    console.log("game: ", game);
+
+    const randomInt = Math.floor(Math.random() * 9000) + 1000;
+    gamePlayLogId = parseInt(new Date().getTime() + randomInt.toString());
+    const gamePlayLog = {
+      gamePlayLogId: gamePlayLogId,
+      gameId: gameId,
+      language: game.Item.language,
+      userPrompt: game.Item.prompt,
+      stories: [],
+      playerActions: [],
+    };
+    const gameStartPrompt = Prompt.gameStartPrompt(game.Item);
+    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, gameStartPrompt);
+  }
   const params = {
-    TableName: `RPG_GameDetails-${process.env.STAGE}`, //
+    TableName: `RPG_GamePlayLogs-${process.env.STAGE}`, //
     Key: {
-      gameId: gameId, // 取得したいアイテムのキー
+      gamePlayLogId: gamePlayLogId, // 取得したいアイテムのキー
     },
   };
-  const gameDetail = (await dynamodb.get(params).promise()).Item;
+  const gamePlayLog = (await dynamodb.get(params).promise()).Item;
 
-  if (gameDetail.playerActions == null) {
-    gameDetail.playerActions = [];
+  if (gamePlayLog.playerActions == null) {
+    gamePlayLog.playerActions = [];
   }
-  gameDetail.playerActions.push(playerAction);
+  gamePlayLog.playerActions.push(playerAction);
 
   //scriptIndexまでのscriptを取得
-  const lastScripts = gameDetail.stories[gameDetail.stories.length - 1];
+  const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
   const splitScripts = TextUtils.splitTexts(lastScripts);
   const script = splitScripts.slice(0, scriptIndex + 1).join("\n");
-  gameDetail.stories[gameDetail.stories.length - 1] = script;
-  await DynamoDB.save("GameDetails", gameDetail);
+  gamePlayLog.stories[gamePlayLog.stories.length - 1] = script;
+  await DynamoDB.save("GamePlayLogs", gamePlayLog);
   
   if (gameEndReason) {
-    const progressWithGameEndReason = Prompt.scriptToGameEnd(gameDetail, gameEndReason);
-    await GameDetailUtil.generateAndSaveViaStream(gameDetail, progressWithGameEndReason);
+    const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason);
+    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
   }
   else {
-    const progressWithPlayerAction = Prompt.progressWithPlayerAction(gameDetail, playerAction);
-    await GameDetailUtil.generateAndSaveViaStream(gameDetail, progressWithPlayerAction);
+    const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, playerAction);
+    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithPlayerAction);
   }
 
   return {
@@ -50,8 +74,6 @@ module.exports.handler = async (event) => {
       "Access-Control-Allow-Origin": '*',
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
-    body: JSON.stringify({
-      gameDetail: gameDetail,
-    }),
+    body: JSON.stringify(gamePlayLog),
   };
 };
