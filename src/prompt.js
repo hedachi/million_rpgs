@@ -77,13 +77,17 @@ partnerの画像を表示
 [effect:(slash, fire)]
 エフェクトを表示
 
+[choices]
+選択肢をプレイヤーに提示
+
 # story scriptの書き方
 セリフ9割
 地の文は2行続けない
 一文は常に短く
 主人公の一人称視点
 改行を連続しない
-commandも記述する`;
+commandも記述する
+最後はプレイヤーへの選択肢を3つ提示する`;
 
 const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例
 僕は、突然目が覚めると、見知らぬ場所にいた。
@@ -97,11 +101,7 @@ const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例
 [effect:slash]
 [show:101]
 [damage:101,low]
-ドラゴンは怒り狂ってメリッサに炎を吐いた！
-[effect:fire]
-メリッサ「きゃっ！」
-[damage:partner,high]
-[partner:injured]`;
+[choices:メリッサを助ける|ドラゴンに立ち向かう|逃げる]`;
 
 const STORY_SCRIPT_EXAMPLE_EN = `# story scriptの出力例
 I woke up in a strange place.
