@@ -11,9 +11,9 @@ module.exports.handler = async (event) => {
   const queryParams = event.queryStringParameters;
   console.log("queryParams: ", queryParams);
   
-  const gameId = parseInt(queryParams.gameId);
-  let gamePlayLogId = parseInt(queryParams.gamePlayLogId) || null;
-  const scriptIndex = parseInt(queryParams.scriptIndex) || 0;
+  const gameId = queryParams.gameId ? parseInt(queryParams.gameId) : null;
+  let gamePlayLogId = queryParams.gamePlayLogId ? parseInt(queryParams.gamePlayLogId) : null;
+  const scriptIndex = queryParams.scriptIndex ? parseInt(queryParams.scriptIndex) : 0;
   const playerAction = queryParams.playerAction;
   const gameEndReason = queryParams.gameEndReason;
   let gamePlayLog = null;
