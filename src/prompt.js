@@ -1,4 +1,4 @@
-const chara_data = [{"id":16,"image":"main_chara_1716355867929_1716355903796.png","character":"未来的な服を着た娘"},{"id":101,"image":1,"character":"ドラゴン"},{"id":102,"image":2,"character":"フェニックス"},{"id":103,"image":3,"character":"巨人"},{"id":111,"image":11,"character":"ゴーレム"},{"id":112,"image":12,"character":"亡霊"},{"id":113,"image":13,"character": "古代機械"},{"id":114,"image":14,"character":"クジラ"},{"id":115,"image":15,"character":"鎧の騎士"},{"id":116,"image":16,"character":"人面樹"}];
+const chara_data = [{"id":1,"image":"suikainu.png","character":"名前:スイカイヌ。スイカとイヌが合体したクダモン。明るく人懐っこいが、思慮が浅い。"},{"id":2,"image":"pinekirin.png","character":"名前:パインキリン。パインとキリンが合体したクダモン。美人で激モテ。高飛車で冷徹。"},{"id":3,"image":"banazou.png","character":"名前:バナゾウ。バナナとゾウが合体したクダモン。嫉妬深く嫌味ったらしいが、男気があるところもある。"},{"id":4,"image":"budolion.png","character":"名前:ブドウライオン。ブドウとライオンとが合体したクダモン。思慮深く決断力があるが、普段は大人しく控えめ。"},{"id":5,"image":"orangeneko.png","character":"名前:オレンジネコ。オレンジとネコが合体したクダモン。落ち着いた年長者。慎重で、石橋を叩いて渡る。腰が重く、いろいろなことを面倒がる。"}];
 
 
 const SETTINGS = `# キャラクター設定
@@ -65,20 +65,26 @@ ${
 }
 
 # commands
-[partner:(normal, angry, happy, sad, attacking, injured, dead)]
-partnerの画像を表示
-
 [show:(id)]
-指定したidのキャラクターを表示。partnerや主人公の表示には使用しない
+指定したidのキャラクターを表示
 
-[damage:(player, partner, id), (low, mid, high)]
-プレイヤー or partner or 指定したidのキャラクターにダメージを与える
+[damage:(id), (low, mid, high)]
+指定したidのキャラクターにダメージを与える
 
 [effect:(slash, fire)]
 エフェクトを表示
 
-[choices]
+[choices:(option1|option2|option3)]
 選択肢をプレイヤーに提示
+
+[change_bg:(number)]
+背景画像を指定番号のものに変更
+1:くだもん諸島のデフォルト背景（海が見える砂浜）
+2:池か川
+3:小屋
+4:海
+5:洞窟の中
+6:森
 
 # story scriptの書き方
 セリフ9割
@@ -87,39 +93,25 @@ partnerの画像を表示
 主人公の一人称視点
 改行を連続しない
 commandも記述する
-最後はプレイヤーへの選択肢を3つ提示する`;
+最後はプレイヤーへの選択肢を3つ提示する
+5〜10行で記述する
+`;
 
 const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例
-僕は、突然目が覚めると、見知らぬ場所にいた。
-僕「あれ、ここは・・・？」
-メリッサ「静かに…！ドラゴンがそこで寝てるわ」
-[show:101]
-僕「うわっ！？」
-大声を出してしまいドラゴンが目覚める。
-メリッサ「ちっ、やるしかないわね！」
-[partner:attacking]
+僕はスイカイヌ。突然目が覚めると、見知らぬ場所にいた。
+スイカイヌ「あれ、ここは・・・？」
+パインキリン「静かに…！バナゾウがそこで寝てるわ」
+[show:3]
+スイカイヌ「うわっ！？」
+大声を出してしまいバナゾウが目覚める。
+バナゾウ「バナバナ〜〜！！」
+パインキリン「ちっ、やるしかないわね！」
 [effect:slash]
-[show:101]
+[show:3]
 [damage:101,low]
-[choices:メリッサを助ける|ドラゴンに立ち向かう|逃げる]`;
+[choices:パインキリンを庇う|バナゾウを殴る|逃げる]`;
 
-const STORY_SCRIPT_EXAMPLE_EN = `# story scriptの出力例
-I woke up in a strange place.
-Me: "Where am I?"
-Melissa: "Quiet! A dragon's sleeping there."
-[show:101]
-Me: "What!?"
-My shout wakes the dragon.
-Melissa: "No choice but to fight!"
-[partner:attacking]
-[effect:slash]
-[show:101]
-[damage:101,low]
-The dragon breathes fire at Melissa!
-[effect:fire]
-Melissa: "Ah!"
-[damage:partner,high]
-[partner:injured]`;
+const STORY_SCRIPT_EXAMPLE_EN = `FIXME`;
 
 const CAUTION = `# 出力に関する注意
 出力には、story scriptの続き「だけ」を記述してください。
