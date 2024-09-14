@@ -9,13 +9,17 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.handler = async (event) => {
   const queryParams = event.queryStringParameters;
+  console.log("queryParams: ", queryParams);
+  
   const gameId = parseInt(queryParams.gameId);
   let gamePlayLogId = parseInt(queryParams.gamePlayLogId) || null;
   const scriptIndex = parseInt(queryParams.scriptIndex) || 0;
   const playerAction = queryParams.playerAction;
   const gameEndReason = queryParams.gameEndReason;
+  let gamePlayLog = null;
 
   if (gamePlayLogId == null) {
+    console.log("パターン1");
     const params = {
       TableName: `RPG_Games-${process.env.STAGE}`,
       Key: {
@@ -27,7 +31,7 @@ module.exports.handler = async (event) => {
 
     const randomInt = Math.floor(Math.random() * 9000) + 1000;
     gamePlayLogId = parseInt(new Date().getTime() + randomInt.toString());
-    const gamePlayLog = {
+    gamePlayLog = {
       gamePlayLogId: gamePlayLogId,
       gameId: gameId,
       language: game.Item.language,
@@ -38,33 +42,36 @@ module.exports.handler = async (event) => {
     const gameStartPrompt = Prompt.gameStartPrompt(game.Item);
     await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, gameStartPrompt);
   }
-  const params = {
-    TableName: `RPG_GamePlayLogs-${process.env.STAGE}`, //
-    Key: {
-      gamePlayLogId: gamePlayLogId, // 取得したいアイテムのキー
-    },
-  };
-  const gamePlayLog = (await dynamodb.get(params).promise()).Item;
-
-  if (gamePlayLog.playerActions == null) {
-    gamePlayLog.playerActions = [];
-  }
-  gamePlayLog.playerActions.push(playerAction);
-
-  //scriptIndexまでのscriptを取得
-  const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
-  const splitScripts = TextUtils.splitTexts(lastScripts);
-  const script = splitScripts.slice(0, scriptIndex + 1).join("\n");
-  gamePlayLog.stories[gamePlayLog.stories.length - 1] = script;
-  await DynamoDB.save("GamePlayLogs", gamePlayLog);
-  
-  if (gameEndReason) {
-    const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason);
-    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
-  }
   else {
-    const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, playerAction);
-    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithPlayerAction);
+    console.log("パターン2");
+    const params = {
+      TableName: `RPG_GamePlayLogs-${process.env.STAGE}`, //
+      Key: {
+        gamePlayLogId: gamePlayLogId, // 取得したいアイテムのキー
+      },
+    };
+    gamePlayLog = (await dynamodb.get(params).promise()).Item;
+  
+    if (gamePlayLog.playerActions == null) {
+      gamePlayLog.playerActions = [];
+    }
+    gamePlayLog.playerActions.push(playerAction);
+  
+    //scriptIndexまでのscriptを取得
+    const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
+    const splitScripts = TextUtils.splitTexts(lastScripts);
+    const script = splitScripts.slice(0, scriptIndex + 1).join("\n");
+    gamePlayLog.stories[gamePlayLog.stories.length - 1] = script;
+    await DynamoDB.save("GamePlayLogs", gamePlayLog);
+    
+    if (gameEndReason) {
+      const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason);
+      await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
+    }
+    else {
+      const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, playerAction);
+      await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithPlayerAction);
+    }
   }
 
   return {
