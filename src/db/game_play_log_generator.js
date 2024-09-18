@@ -46,7 +46,7 @@ class GamePlayLogGenerator {
     //   }
     // });
 
-    await LLM.generate(this.gameId, prompt, mainAiModel, (text) => {
+    await LLM.generate(prompt, mainAiModel, (text) => {
       response += text;
     });
     gamePlayLog.stories[nextStoryIndex] = response;

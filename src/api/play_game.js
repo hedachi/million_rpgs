@@ -11,23 +11,34 @@ module.exports.handler = async (event) => {
   const queryParams = event.queryStringParameters;
   console.log("queryParams: ", queryParams);
   
+  console.log("hoge1");
   const gameId = queryParams.gameId ? parseInt(queryParams.gameId) : null;
   let gamePlayLogId = queryParams.gamePlayLogId ? parseInt(queryParams.gamePlayLogId) : null;
+  console.log("hoge2");
   const scriptIndex = queryParams.scriptIndex ? parseInt(queryParams.scriptIndex) : 0;
   const playerAction = queryParams.playerAction;
   const gameEndReason = queryParams.gameEndReason;
+
+  console.log(`hoge3 gameId: ${gameId}, gamePlayLogId: ${gamePlayLogId}, scriptIndex: ${scriptIndex}, playerAction: ${playerAction}, gameEndReason: ${gameEndReason}`);
+
+
   let gamePlayLog = null;
 
   if (gamePlayLogId == null) {
     console.log("パターン1");
-    const params = {
+    const game = await dynamodb.get({
       TableName: `RPG_Games-${process.env.STAGE}`,
       Key: {
         gameId: gameId,
       },
-    };
-    const game = await dynamodb.get(params).promise();
+    }).promise();
     console.log("game: ", game);
+    const gameDetail = await dynamodb.get({
+      TableName: `RPG_GameDetails-${process.env.STAGE}`,
+      Key: {
+        gameId: gameId,
+      },
+    }).promise();
 
     const randomInt = Math.floor(Math.random() * 9000) + 1000;
     gamePlayLogId = parseInt(new Date().getTime() + randomInt.toString());
@@ -39,7 +50,7 @@ module.exports.handler = async (event) => {
       stories: [],
       playerActions: [],
     };
-    const gameStartPrompt = Prompt.gameStartPrompt(game.Item);
+    const gameStartPrompt = Prompt.gameStartPrompt(game.Item, gameDetail.Item.gameDetails);
     await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, gameStartPrompt);
   }
   else {
@@ -52,6 +63,12 @@ module.exports.handler = async (event) => {
     };
     gamePlayLog = (await dynamodb.get(params).promise()).Item;
   
+    const gameDetail = await dynamodb.get({
+      TableName: `RPG_GameDetails-${process.env.STAGE}`,
+      Key: {
+        gameId: gamePlayLog.gameId,
+      },
+    }).promise();
     if (gamePlayLog.playerActions == null) {
       gamePlayLog.playerActions = [];
     }
@@ -65,11 +82,11 @@ module.exports.handler = async (event) => {
     await DynamoDB.save("GamePlayLogs", gamePlayLog);
     
     if (gameEndReason) {
-      const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason);
+      const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason, gameDetail.Item.gameDetails);
       await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
     }
     else {
-      const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, playerAction);
+      const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, gameDetail.Item.gameDetails);
       await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithPlayerAction);
     }
   }

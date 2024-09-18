@@ -3,7 +3,7 @@ const Anthropic = require("@anthropic-ai/sdk");
 class LLM {
   static CLAUDE_BEST_MODEL = "claude-3-5-sonnet-20240620";
 
-  static async generate(gameId, prompt, model = CLAUDE_BEST_MODEL, streamingCallback = null) {
+  static async generate(prompt, model = CLAUDE_BEST_MODEL, streamingCallback = null) {
     console.log("LLM実行 prompt: " + prompt);
 
     const anthropic = new Anthropic({
