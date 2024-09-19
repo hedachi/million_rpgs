@@ -11,6 +11,7 @@ provider:
   environment:
     ANTHROPIC_API_KEY: ${env:ANTHROPIC_API_KEY}
     STAGE: ${self:provider.stage}
+    S3_BUCKET_NAME: kudamon-island
   timeout: 180
   iam:
     role:
@@ -22,10 +23,14 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:Scan
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
           Resource:
             - arn:aws:dynamodb:ap-northeast-1:831431380716:table/RPG_GameDetails-${self:provider.stage}
             - arn:aws:dynamodb:ap-northeast-1:831431380716:table/RPG_Games-${self:provider.stage}
             - arn:aws:dynamodb:ap-northeast-1:831431380716:table/RPG_GameGenLogs
+            - arn:aws:s3:::kudamon-island/*
         - Effect: Allow
           Action:
             - s3:GetObject
@@ -77,6 +82,13 @@ functions:
           path: debug_get_next_or_prev_game
           method: get
           cors: true
+  get_s3_signing_url:
+    handler: src/api/get_s3_signing_url.handler
+    events:
+      - http:
+          path: get_s3_signing_url
+          method: get
+          cors: true
 
 resources:
   Resources:
@@ -113,6 +125,21 @@ resources:
           - AttributeName: gamePlayLogId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: kudamon-island
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'  # 必要に応じて適切なドメインに変更
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+              AllowedHeaders:
+                - '*'
 
 package:
   individually: true
