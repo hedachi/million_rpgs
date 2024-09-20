@@ -16,11 +16,21 @@ exports.handler = async (event) => {
         const uploadUrl = await s3.getSignedUrlPromise('putObject', params);
         return {
             statusCode: 200,
+            headers: {
+              "Access-Control-Allow-Headers": "Content-Type",
+              "Access-Control-Allow-Origin": '*',
+              "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+            },
             body: uploadUrl
         };
     } catch (err) {
         return {
             statusCode: 500,
+            headers: {
+              "Access-Control-Allow-Headers": "Content-Type",
+              "Access-Control-Allow-Origin": '*',
+              "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+            },
             body: JSON.stringify({ error: 'Error generating upload URL' })
         };
     }
