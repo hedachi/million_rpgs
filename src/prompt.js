@@ -16,7 +16,8 @@ const background_images = `1:海が見える砂浜（くだもん諸島のデフ
 6:森
 `;
 
-const GAME_PROMPT_1 = `# 使用可能キャラクターのidと設定
+const game_prompt = (situation) => {
+  let prompt = `# 使用可能キャラクターのidと設定
 ${
   chara_data.map((chara) => `${chara.id}. ${chara.character}`).join('\n')
 }
@@ -31,17 +32,22 @@ ${
 [effect:(slash, fire)]
 エフェクトを表示
 
-[choices:(option1|option2|option3)]
-選択肢をプレイヤーに提示
-
 [change_bg:(number)]
 背景画像を指定番号のものに変更
 ${background_images}
 
-[game_over]
-ゲームオーバーになった場合はこのコマンドを最後に出力
-本ゲームはちょっとしたトラブルでもすぐにゲームオーバーになります
+`
+if (situation !== "gameover") {
+prompt += `
+[troubled:(trouble_description)]
+トラブルが起きたらこのコマンドを出力
 
+[choices:(option1|option2|option3)]
+トラブルが起きなかったら、このコマンドを最後に出力
+選択肢をプレイヤーに提示する`
+}
+
+prompt += `
 # story scriptの書き方
 セリフ9割
 地の文は2行続けない
@@ -49,12 +55,17 @@ ${background_images}
 主人公の一人称視点
 改行を連続しない
 commandも記述する
-最後は、トラブルがあったらゲームオーバーにする
-トラブルがなかった場合、プレイヤーへの選択肢を3つ提示する
-選択肢のうち1つか2つはゲームオーバーになる
-キャラクターの設定を踏まえてゲームオーバーになりそうな選択肢を記述する
-5〜10行で記述する
-`;
+5〜10行で記述する`;
+
+if (situation !== "gameover") {
+prompt += `
+ほんのちょっとでもトラブルがあったら[troubled]コマンドを出力
+最後は、プレイヤーへの選択肢を3つ提示する
+選択肢のうち1つか2つは、キャラクターの設定を踏まえてトラブルになりそうなものにする
+`
+}
+return prompt;
+}
 
 const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例（これは例です！このまま使うの絶対禁止！！！）
 僕はスイカイヌ。突然目が覚めると、見知らぬ場所にいた。
@@ -84,7 +95,7 @@ ${game.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_E
 # ゲーム設定
 ${gameDetails}
 
-${GAME_PROMPT_1}
+${game_prompt()}
 
 ${CAUTION}
 
@@ -99,7 +110,7 @@ const progressWithPlayerAction = (gamePlayLog, gameDetails) => `${active_setting
 # ゲーム設定
 ${gameDetails}
 
-${GAME_PROMPT_1}
+${game_prompt()}
 
 ${gamePlayLog.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
@@ -129,7 +140,7 @@ const scriptToGameEnd = (gamePlayLog, gameEndReason, gameDetails) => `${active_s
 # ゲーム設定
 ${gameDetails}
 
-${GAME_PROMPT_1}
+${game_prompt("gameover")}
 
 ${gamePlayLog.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
 
