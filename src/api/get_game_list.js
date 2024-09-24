@@ -18,14 +18,19 @@ module.exports.handler = async (event) => {
       return 0;
     });
 
-    games = games.slice(0, 4);
+    games = games.slice(0, 10);
     const tableName = `RPG_GameDetails-${process.env.STAGE}`;
     const details = await DynamoDB.batchGetItems(tableName , games.map(game => { return { gameId : game.gameId } }));
     console.log(details);
     games = games.map(game => {
       const detail = details.find(detail => detail.gameId === game.gameId);
       //game.merge(detail);
-      Object.assign(game, detail);
+      const gameDetail = JSON.parse(detail.gameDetails);
+      gameDetail.places = null;
+      gameDetail.playTime = Math.floor(Math.random() * 1000);
+      //最速くんか最速さんかをランダムに決める
+      gameDetail.champion = Math.random() > 0.5 ? "最速くん" : "最速さん";
+      Object.assign(game, gameDetail);
       return game;
     });
 
