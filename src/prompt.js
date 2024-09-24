@@ -46,6 +46,13 @@ prompt += `
 トラブルが起きなかったら、このコマンドを最後に出力
 選択肢をプレイヤーに提示する`
 }
+else
+{
+  prompt += `
+[gameend]
+物語が終了する場合、最後にこれを出力
+`
+}
 
 prompt += `
 # story scriptの書き方
@@ -67,19 +74,33 @@ prompt += `
 return prompt;
 }
 
-const STORY_SCRIPT_EXAMPLE_JP = `# story scriptの出力例（これは例です！このまま使うの絶対禁止！！！）
-僕はスイカイヌ。突然目が覚めると、見知らぬ場所にいた。
-スイカイヌ「あれ、ここは・・・？」
-パインキリン「静かに…！バナゾウがそこで寝てるわ」
-[show:3]
-スイカイヌ「うわっ！？」
-大声を出してしまいバナゾウが目覚める。
-バナゾウ「バナバナ〜〜！！」
-パインキリン「ちっ、やるしかないわね！」
-[effect:slash]
-[show:3]
-[damage:101,low]
-[choices:パインキリンを庇う|バナゾウを殴る|逃げる]`;
+const story_script_example = (situation) => {
+
+  if (situation !== "gameover") {
+    return `# story scriptの出力例（これは例です！このまま使うの絶対禁止！！！）
+[change_bg:6]
+僕らはくだもん諸島の森にやってきた。
+イチガオ「よっしゃ！森に来たぞ！」
+メロチ「わあ、美味しそうな果物がいっぱい...」
+バナゾウ「グレットを探すんだバナ！食べ物に気を取られちゃダメだバナ！」
+イチガオ「えー、でも腹減ったし...」
+メロチ「...ん？あれ見て！」
+大きな木の上に何か動くものが見える。
+メロチ「もしかして、グレット！？」
+[choices:木に登る|念のため逃げる|声をかける]`
+  } else {
+    return `# story scriptの出力例（これは例です！このまま使うの絶対禁止！！！）
+イチガオ「ふぅ...やっと森に着いたぞ」
+メロチ「グレットの匂いがするわ。この辺りかもしれないわね」
+バナゾウ「よーし！探すぞー！」
+[show:1,3,4]
+イチガオ「でも、疲れたな...ちょっと休憩しようぜ」
+メロチ「そうだね...」
+そのままみんな眠ってしまい、日が暮れた。
+[gameend]`;
+  }
+};
+
 
 const STORY_SCRIPT_EXAMPLE_EN = `FIXME`;
 
@@ -90,7 +111,7 @@ const CAUTION = `# 出力に関する注意
 
 const gameStartPrompt = (game, gameDetails) => `${active_settings}
 
-${game.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+${story_script_example("start")}
 
 # ゲーム設定
 ${gameDetails}
@@ -112,7 +133,7 @@ ${gameDetails}
 
 ${game_prompt()}
 
-${gamePlayLog.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+${story_script_example()}
 
 # ここまでのstory script
 ${gamePlayLog.stories.join('\n')}
@@ -142,7 +163,7 @@ ${gameDetails}
 
 ${game_prompt("gameover")}
 
-${gamePlayLog.language == "Japanese" ? STORY_SCRIPT_EXAMPLE_JP : STORY_SCRIPT_EXAMPLE_EN}
+${story_script_example("gameover")}
 
 # ここまでのstory script
 ${gamePlayLog.stories.join('\n')}
@@ -155,7 +176,7 @@ ${gamePlayLog.language}
 # ゲーム終了の理由
 ${gameEndReason}
 
-# 最後までのstory script（ゲーム終了の理由に従い即座に物語を終わらせてください。damageイベントは不要）
+# 物語の最後までのstory script（ゲーム終了の理由に従って即座に物語を終わらせてください）
 `;
 
 const gameDetailsGeneratePrompt = (prompt) => `
