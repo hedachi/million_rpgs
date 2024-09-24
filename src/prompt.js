@@ -216,6 +216,38 @@ ${background_images}
 出力フォーマットに従ったJSONのみを出力してください`;
 
 
+const newsPrompt = () => {`
+
+# ゲーム設定
+${gameDetails}
+
+# 使用可能キャラクターのidと特徴
+${
+  chara_data.map((chara) => `${chara.id}. ${chara.character}`).join('\n')
+}
+    
+# ここまでのstory script
+${gamePlayLog.stories.join('\n')}
+
+# ニュースのタイトルの例（これは例です！このまま使うの絶対禁止！）
+バナゾウ、みかんの皮が歯にはさまる
+
+# ニュース本文の例（これは例です！このまま使うの絶対禁止！）
+【くだもんアイランド　5日】スイカイヌが、バナゾウからバナナをもらって食べたところ、お腹いっぱいになってお昼寝してしまったことが、5日、わかった。
+
+現場にはバナナの皮が落ちていたことが確認された。
+スイカイヌは調べに対し、「小腹が空いており、おやつの時間だったので食べてしまった。今は反省している」と話している。
+
+# 出力フォーマット
+()内に値を入れてください
+場所は特に指示がなければ3つぐらい
+{
+  "title" : (ニュースのタイトル),
+  "body" : (ニュース本文),
+}
+`
+};
+
 module.exports = {
   gameStartPrompt: gameStartPrompt,
   progressWithPlayerAction: progressWithPlayerAction,
