@@ -18,6 +18,32 @@ class DynamoDB {
       throw error;
     }
   }
+
+  static async batchGetItems(tableName, keys) {
+    console.log(`batchGetItems tableName: ${tableName}, Keys: ${
+      JSON.stringify(keys)
+    }`);
+    const params = {
+      RequestItems: {
+        [tableName]: {
+          Keys: keys
+        }
+      }
+    };
+    console.log(`params: ${JSON.stringify(params)}`);
+
+  
+    return new Promise((resolve, reject) => {
+      dynamodb.batchGet(params, (error, data) => {
+        if (error) {
+          console.error("Error fetching items:", error);
+          reject(error);
+        } else {
+          resolve(data.Responses[tableName]);
+        }
+      });
+    });
+  }
 }
 
 module.exports = DynamoDB;

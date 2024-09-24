@@ -13,7 +13,8 @@ module.exports.handler = async (event) => {
   const rpgPrompt = event?.queryStringParameters?.prompt;
   const language = event?.queryStringParameters?.language;
   const randomInt = Math.floor(Math.random() * 9000) + 1000;
-  const gameId = parseInt(new Date().getTime() + randomInt.toString());  
+  const gameId = parseInt(new Date().getTime() + randomInt.toString());
+  let gameDetails = null;
 
   try {
     const game = {
@@ -26,7 +27,7 @@ module.exports.handler = async (event) => {
     const mainAiModel = LLM.CLAUDE_BEST_MODEL;
     const gameDetailsGeneratePrompt = Prompt.gameDetailsGeneratePrompt(rpgPrompt);
     const response = await LLM.generate(gameDetailsGeneratePrompt, mainAiModel);
-    const gameDetails = {
+    gameDetails = {
       gameId: gameId,
       gameDetails: response,
     };
@@ -44,9 +45,10 @@ module.exports.handler = async (event) => {
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
     body: JSON.stringify({
-      message: `"${rpgPrompt}"のRPG生成指示を受け付けました: ${new Date().
+      message: `"${rpgPrompt}"のシナリオを作成しました: ${new Date().
       toLocaleString('ja-JP')}`,
-      gameId: gameId
+      gameId: gameId,
+      scenario: JSON.parse(gameDetails.gameDetails),
     }),
   };
 };

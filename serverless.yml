@@ -54,6 +54,13 @@ functions:
           path: get_game
           method: get
           cors: true
+  get_scenario:
+    handler: src/api/get_scenario.handler
+    events:
+      - http:
+          path: get_scenario
+          method: get
+          cors: true
   get_game_list:
     handler: src/api/get_game_list.handler
     events:

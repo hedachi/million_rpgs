@@ -1,3 +1,4 @@
+const DynamoDB = require("../db/dynamo_db");
 const AWS = require('aws-sdk');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
@@ -9,13 +10,25 @@ module.exports.handler = async (event) => {
     };
 
     const data = await dynamodb.scan(params).promise();
-    const games = data.Items;
+    let games = data.Items;
     //gamesをidでソート
     games.sort((a, b) => {
       if (a.gameId < b.gameId) return 1;
       if (a.gameId > b.gameId) return -1;
       return 0;
     });
+
+    games = games.slice(0, 4);
+    const tableName = `RPG_GameDetails-${process.env.STAGE}`;
+    const details = await DynamoDB.batchGetItems(tableName , games.map(game => { return { gameId : game.gameId } }));
+    console.log(details);
+    games = games.map(game => {
+      const detail = details.find(detail => detail.gameId === game.gameId);
+      //game.merge(detail);
+      Object.assign(game, detail);
+      return game;
+    });
+
     return {
       statusCode: 200,
       headers: {
