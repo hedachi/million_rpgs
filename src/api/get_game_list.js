@@ -46,6 +46,16 @@ module.exports.handler = async (event) => {
   }
   catch (error) {
     console.error("Error getting game:", error);
-    throw error;
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Origin": '*',
+        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+      },
+      body: JSON.stringify({
+        error: "ゲーム一覧の取得に失敗しました",
+      }),
+    };
   }
 };
