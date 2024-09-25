@@ -12,78 +12,29 @@ module.exports.handler = async (event) => {
   const queryParams = event.queryStringParameters;
   console.log("queryParams: ", queryParams);
   
-  const gameId = queryParams.gameId ? parseInt(queryParams.gameId) : null;
-  let gamePlayLogId = queryParams.gamePlayLogId ? parseInt(queryParams.gamePlayLogId) : null;
-  const scriptIndex = queryParams.scriptIndex ? parseInt(queryParams.scriptIndex) : 0;
-  const playerAction = queryParams.playerAction;
-  const gameEndReason = queryParams.gameEndReason;
+  const gameId = parseInt(queryParams.gameId);
+  const gamePlayLogId = parseInt(queryParams.gamePlayLogId);
 
-  let gamePlayLog = null;
-
-  if (gamePlayLogId == null) {
-    const game = await dynamodb.get({
-      TableName: `RPG_Games-${process.env.STAGE}`,
-      Key: {
-        gameId: gameId,
-      },
-    }).promise();
-    console.log("game: ", game);
-    const gameDetail = await dynamodb.get({
-      TableName: `RPG_GameDetails-${process.env.STAGE}`,
-      Key: {
-        gameId: gameId,
-      },
-    }).promise();
-
-    const randomInt = Math.floor(Math.random() * 9000) + 1000;
-    gamePlayLogId = parseInt(new Date().getTime() + randomInt.toString());
-    gamePlayLog = {
-      gamePlayLogId: gamePlayLogId,
+  const gameDetail = await dynamodb.get({
+    TableName: `RPG_GameDetails-${process.env.STAGE}`,
+    Key: {
       gameId: gameId,
-      language: game.Item.language,
-      userPrompt: game.Item.prompt,
-      stories: [],
-      playerActions: [],
-    };
-    const gameStartPrompt = Prompt.gameStartPrompt(game.Item, gameDetail.Item.gameDetails);
-    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, gameStartPrompt);
-  }
-  else {
-    const params = {
-      TableName: `RPG_GamePlayLogs-${process.env.STAGE}`, //
-      Key: {
-        gamePlayLogId: gamePlayLogId, // 取得したいアイテムのキー
-      },
-    };
-    gamePlayLog = (await dynamodb.get(params).promise()).Item;
-  
-    const gameDetail = await dynamodb.get({
-      TableName: `RPG_GameDetails-${process.env.STAGE}`,
-      Key: {
-        gameId: gamePlayLog.gameId,
-      },
-    }).promise();
-    if (gamePlayLog.playerActions == null) {
-      gamePlayLog.playerActions = [];
-    }
-    gamePlayLog.playerActions.push(playerAction);
-  
-    //scriptIndexまでのscriptを取得
-    const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
-    const splitScripts = TextUtils.splitTexts(lastScripts);
-    const script = splitScripts.slice(0, scriptIndex + 1).join("\n");
-    gamePlayLog.stories[gamePlayLog.stories.length - 1] = script;
-    await DynamoDB.save("GamePlayLogs", gamePlayLog);
-    
-    if (gameEndReason) {
-      const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason, gameDetail.Item.gameDetails);
-      await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
-    }
-    else {
-      const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, gameDetail.Item.gameDetails);
-      await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithPlayerAction);
-    }
-  }
+    },
+  }).promise().Item;
+  const gamePlayLog = (await dynamodb.get({
+    TableName: `RPG_GamePlayLogs-${process.env.STAGE}`,
+    Key: {
+      gamePlayLogId: gamePlayLogId,
+    },
+  }).promise()).Item;
+
+  const mainAiModel = LLM.CLAUDE_BEST_MODEL;
+  const resultNewsPrompt = Prompt.newsPrompt(gameDetail, gamePlayLog);
+  const response = await LLM.generate(resultNewsPrompt, mainAiModel);
+  console.log("resultNews: ", response);
+
+  // const processedData = response.replace(/\n/g, '\\n');
+  // console.log("processedData: ", processedData);
 
   return {
     statusCode: 200,
@@ -92,6 +43,7 @@ module.exports.handler = async (event) => {
       "Access-Control-Allow-Origin": '*',
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
-    body: JSON.stringify(gamePlayLog),
+    // body: JSON.stringify(response),
+    body: JSON.stringify(JSON.parse(response)),
   };
 };

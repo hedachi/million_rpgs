@@ -179,8 +179,7 @@ ${gameEndReason}
 # 物語の最後までのstory script（ゲーム終了の理由に従って即座に物語を終わらせてください）
 `;
 
-const gameDetailsGeneratePrompt = (prompt) => `
-${active_settings}
+const gameDetailsGeneratePrompt = (prompt) => `${active_settings}
 
 # ユーザーの追加要望
 ${prompt}
@@ -195,7 +194,7 @@ ${
 # 場所
 ${background_images}
 
-# 出力フォーマット
+# 出力JSONフォーマット
 ()内に値を入れてください
 場所は特に指示がなければ3つぐらい
 {
@@ -209,14 +208,14 @@ ${background_images}
       "clear_requirement" : (場所のクリア条件),
       "background_image_number" : (背景画像の番号)
     }
-  ],
+  ]
 }
 
 # 出力の注意
 出力フォーマットに従ったJSONのみを出力してください`;
 
 
-const newsPrompt = () => {`
+const newsPrompt = (gameDetails, gamePlayLog) => { return `${active_settings}
 
 # ゲーム設定
 ${gameDetails}
@@ -233,19 +232,18 @@ ${gamePlayLog.stories.join('\n')}
 バナゾウ、みかんの皮が歯にはさまる
 
 # ニュース本文の例（これは例です！このまま使うの絶対禁止！）
-【くだもんアイランド　5日】スイカイヌが、バナゾウからバナナをもらって食べたところ、お腹いっぱいになってお昼寝してしまったことが、5日、わかった。
+【くだもんアイランド 5日】スイカイヌが、バナゾウからバナナをもらって食べたところ、お腹いっぱいになってお昼寝してしまったことが、5日、わかった。現場にはバナナの皮が落ちていたことが確認された。スイカイヌは調べに対し、「小腹が空いており、おやつの時間だったので食べてしまった。今は反省している」と話している。
 
-現場にはバナナの皮が落ちていたことが確認された。
-スイカイヌは調べに対し、「小腹が空いており、おやつの時間だったので食べてしまった。今は反省している」と話している。
-
-# 出力フォーマット
+# 出力JSONフォーマット
 ()内に値を入れてください
 場所は特に指示がなければ3つぐらい
 {
   "title" : (ニュースのタイトル),
-  "body" : (ニュース本文),
+  "body" : (ニュース本文)
 }
-`
+
+# 出力の注意
+出力フォーマットに従ったJSONのみを出力してください`
 };
 
 module.exports = {
@@ -253,4 +251,5 @@ module.exports = {
   progressWithPlayerAction: progressWithPlayerAction,
   scriptToGameEnd: scriptToGameEnd,
   gameDetailsGeneratePrompt: gameDetailsGeneratePrompt,
+  newsPrompt: newsPrompt,
 }

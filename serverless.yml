@@ -82,6 +82,13 @@ functions:
           path: play_game
           method: get
           cors: true
+  end_game:
+    handler: src/api/end_game.handler
+    events:
+      - http:
+          path: end_game
+          method: get
+          cors: true
   debug_get_next_or_prev_game:
     handler: src/api/debug_get_next_or_prev_game.handler
     events:
