@@ -1,4 +1,5 @@
 const Anthropic = require("@anthropic-ai/sdk");
+const { log } = require("console");
 
 class LLM {
   static CLAUDE_BEST_MODEL = "claude-3-5-sonnet-20240620";
@@ -11,9 +12,6 @@ class LLM {
     console.log("################################################################################################################################");
     console.log("####################################################### prompt end #############################################################");
     console.log("################################################################################################################################");
-
-    //logs/prompt/以下にpromptを保存
-    this.savePrompt(prompt);
 
     const anthropic = new Anthropic({
       apiKey: process.env["ANTHROPIC_API_KEY"]
@@ -48,18 +46,27 @@ class LLM {
     */
     const message = await stream.finalMessage();
     console.log(message);
-    return message.content[0].text
+
+    const response = message.content[0].text;
+    //logs/prompt/以下にpromptを保存
+    if (process.env.STAGE === "dev") {
+      this.saveLog(prompt, response);
+    }
+
+    return response;
   }
 
-  static savePrompt(prompt) {
+  static saveLog(prompt, response) {
     const fs = require('fs');
     const path = require('path');
-    const promptDir = path.join(__dirname, "../logs/prompt");
+    const promptDir = path.join(__dirname, "../logs/llm");
     if (!fs.existsSync(promptDir)) {
       fs.mkdirSync(promptDir, { recursive: true });
     }
-    const promptFile = path.join(promptDir, new Date().toISOString().replace(/:/g, "-") + ".txt");
-    fs.writeFileSync(promptFile, prompt);
+    const promptFile = path.join(promptDir, new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).replace(/[/\s:]/g, "-") + ".txt");
+    // const promptFile = path.join(promptDir, new Date().toISOString().replace(/:/g, "-") + ".txt");
+    const logContent = prompt + "\n======================================================================\n" + response;
+    fs.writeFileSync(promptFile, logContent);
   }
 }
 
