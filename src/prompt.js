@@ -1,9 +1,9 @@
 const chara_data = require('./charas.json');
 
 const SETTINGS_6 = `# 世界設定
-くだもん諸島は、果物と動物が合体した「くだもん」たちが暮らす島々。
-人間はいない。
-くだもん達は小学生ぐらいの知能レベルを持ち、話すことができる。`;
+くだもん諸島は、果物と動物が合体した「くだもん」たちが暮らす島々。人間はいない。
+くだもん達は小学生ぐらいの知能レベルを持ち、話すことができる。
+くだもん達はやる気がなく、移り気で、やろうとしていたことをすぐにやめてしまう。`;
 
 const background_images = `1:海が見える砂浜（くだもん諸島のデフォルト背景画像）
 2:池か川
@@ -30,14 +30,18 @@ ${background_images}
 エフェクトを表示
 
 `
-if (situation !== "gameover") {
+if (situation !== "gameover" && situation !== "start") {
 prompt += `
 [troubled:(trouble_description)]
 トラブルが起きたらこのコマンドを出力
-
+`
+}
+if (situation !== "gameover") {
+prompt += `
 [choices:(option1|option2|option3)]
 トラブルが起きなかったら、このコマンドを最後に出力
-選択肢をプレイヤーに提示する`
+選択肢をプレイヤーに提示する
+`
 }
 else
 {
@@ -57,11 +61,14 @@ prompt += `
 commandも記述する
 5〜10行で記述する`;
 
+if (situation !== "gameover" && situation !== "start") {
+  prompt += `
+ほんのちょっとでもトラブルがあったら[troubled]コマンドを出力
+`}
 if (situation !== "gameover") {
 prompt += `
-ほんのちょっとでもトラブルがあったら[troubled]コマンドを出力
 最後は、プレイヤーへの選択肢を3つ提示する
-選択肢のうち1つか2つは、キャラクターの設定を踏まえてトラブルになりそうなものにする
+選択肢のうち1つか2つは、キャラクターの設定を踏まえて、トラブルになりそうなものにする
 `
 }
 return prompt;
@@ -70,7 +77,7 @@ return prompt;
 const story_script_example = (situation) => {
 
   if (situation !== "gameover") {
-    return `# story scriptの出力例（
+    return `# story scriptの出力例
 [change_bg:6]
 僕らはジャングルリン諸島の森にやってきた。
 石川「よっしゃ！森に来たぞ！」
@@ -99,6 +106,10 @@ const STORY_SCRIPT_EXAMPLE_EN = `FIXME`;
 const CAUTION = `# 出力に関する注意
 出力には、story script「だけ」を記述してください。`;
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 const gameStartPrompt = (game, gameDetails) => `${active_settings}
 
 ${story_script_example("start")}
@@ -106,7 +117,7 @@ ${story_script_example("start")}
 # ゲーム設定
 ${gameDetails}
 
-${game_prompt()}
+${game_prompt("start")}
 
 ${CAUTION}
 
