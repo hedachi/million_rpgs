@@ -12,6 +12,9 @@ class LLM {
     console.log("####################################################### prompt end #############################################################");
     console.log("################################################################################################################################");
 
+    //logs/prompt/以下にpromptを保存
+    this.savePrompt(prompt);
+
     const anthropic = new Anthropic({
       apiKey: process.env["ANTHROPIC_API_KEY"]
     });
@@ -46,6 +49,17 @@ class LLM {
     const message = await stream.finalMessage();
     console.log(message);
     return message.content[0].text
+  }
+
+  static savePrompt(prompt) {
+    const fs = require('fs');
+    const path = require('path');
+    const promptDir = path.join(__dirname, "../logs/prompt");
+    if (!fs.existsSync(promptDir)) {
+      fs.mkdirSync(promptDir, { recursive: true });
+    }
+    const promptFile = path.join(promptDir, new Date().toISOString().replace(/:/g, "-") + ".txt");
+    fs.writeFileSync(promptFile, prompt);
   }
 }
 

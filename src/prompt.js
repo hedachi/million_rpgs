@@ -70,7 +70,7 @@ return prompt;
 const story_script_example = (situation) => {
 
   if (situation !== "gameover") {
-    return `# story scriptの出力例
+    return `# story scriptの出力例（
 [change_bg:6]
 僕らはジャングルリン諸島の森にやってきた。
 石川「よっしゃ！森に来たぞ！」
@@ -93,7 +93,6 @@ const story_script_example = (situation) => {
 [gameend]`;
   }
 };
-
 
 const STORY_SCRIPT_EXAMPLE_EN = `FIXME`;
 
