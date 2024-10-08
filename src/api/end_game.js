@@ -3,6 +3,7 @@ const GamePlayLogGenerator = require("../db/game_play_log_generator");
 const LLM = require("../llm");
 const Prompt = require('../prompt');
 const AWS = require('aws-sdk');
+AWS.config.logger = console;
 const TextUtils = require('../text_utils');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
@@ -24,12 +25,13 @@ module.exports.handler = async (event) => {
 
   console.log("gamePlayLog.gameId: ", gamePlayLog.gameId);
 
-  const gameDetail = await dynamodb.get({
+  const gameDetail = (await dynamodb.get({
     TableName: `RPG_GameDetails-${process.env.STAGE}`,
     Key: {
       gameId: parseInt(gamePlayLog.gameId),
     },
-  }).promise().Item;
+  }).promise()).Item;
+  console.log("gameDetail: " + gameDetail);
 
   if (gamePlayLog.resultNews == null) {
     const mainAiModel = LLM.CLAUDE_BEST_MODEL;
@@ -45,6 +47,10 @@ module.exports.handler = async (event) => {
   // const processedData = response.replace(/\n/g, '\\n');
   // console.log("processedData: ", processedData);
 
+  let responseBody = JSON.parse(gamePlayLog.resultNews);
+  responseBody.gamePlayLogId = gamePlayLogId;
+  console.log("gameDetail: " + gameDetail); 
+  responseBody.main_character_id = JSON.parse(gameDetail.gameDetails).main_character_id;
   return {
     statusCode: 200,
     headers: {
@@ -53,6 +59,6 @@ module.exports.handler = async (event) => {
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
     // body: JSON.stringify(response),
-    body: JSON.stringify(JSON.parse(gamePlayLog.resultNews)),
+    body: JSON.stringify(responseBody),
   };
 };
