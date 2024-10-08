@@ -54,6 +54,7 @@ module.exports.handler = async (event) => {
         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
       },
       body: JSON.stringify({
+        gameId: gameId,
         scenario: JSON.parse(data.Item.gameDetails),
       }),
     };

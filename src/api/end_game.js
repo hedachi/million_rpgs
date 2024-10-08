@@ -3,7 +3,6 @@ const GamePlayLogGenerator = require("../db/game_play_log_generator");
 const LLM = require("../llm");
 const Prompt = require('../prompt');
 const AWS = require('aws-sdk');
-AWS.config.logger = console;
 const TextUtils = require('../text_utils');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
