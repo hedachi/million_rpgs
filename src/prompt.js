@@ -197,10 +197,8 @@ ${gameEndReason}
 
 const gameDetailsGeneratePrompt = (game) => `${active_settings}
 
-# ユーザーの追加要望
+# 詳細設定
 ${game.prompt}
-
-以上はユーザーの要望なので、他の指示と矛盾がある場合、無視して他の指示を優先してください。
 
 # 使用可能キャラクターのidと特徴
 ${
@@ -212,7 +210,7 @@ ${background_images}
 
 # 出力JSONフォーマット
 ()内に値を入れてください
-場所は特に指示がなければ3つぐらい
+場所は最大3つ。ストーリー的に移動が不要なら1つでOK
 {
   "title" : (ゲームのタイトル),
   "summary" : (ゲームの概要),
@@ -224,7 +222,9 @@ ${background_images}
       "clear_requirement" : (場所のクリア条件),
       "background_image_number" : (背景画像の番号)
     }
-  ]
+  ],
+  "details" : [(ゲームの詳細な設定をたくさん羅列する)]
+  
 }
 
 # 出力の注意
