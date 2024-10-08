@@ -12,15 +12,8 @@ module.exports.handler = async (event) => {
   const queryParams = event.queryStringParameters;
   console.log("queryParams: ", queryParams);
   
-  const gameId = parseInt(queryParams.gameId);
   const gamePlayLogId = parseInt(queryParams.gamePlayLogId);
 
-  const gameDetail = await dynamodb.get({
-    TableName: `RPG_GameDetails-${process.env.STAGE}`,
-    Key: {
-      gameId: gameId,
-    },
-  }).promise().Item;
   const gamePlayLog = (await dynamodb.get({
     TableName: `RPG_GamePlayLogs-${process.env.STAGE}`,
     Key: {
@@ -28,10 +21,23 @@ module.exports.handler = async (event) => {
     },
   }).promise()).Item;
 
-  const mainAiModel = LLM.CLAUDE_BEST_MODEL;
-  const resultNewsPrompt = Prompt.newsPrompt(gameDetail, gamePlayLog);
-  const response = await LLM.generate("ゲーム終了", resultNewsPrompt, mainAiModel);
-  console.log("resultNews: ", response);
+  const gameDetail = await dynamodb.get({
+    TableName: `RPG_GameDetails-${process.env.STAGE}`,
+    Key: {
+      gameId: gamePlayLog.gameId,
+    },
+  }).promise().Item;
+
+  if (gamePlayLog.resultNews == null) {
+    const mainAiModel = LLM.CLAUDE_BEST_MODEL;
+    const resultNewsPrompt = Prompt.newsPrompt(gameDetail, gamePlayLog);
+    const response = await LLM.generate("ゲーム終了", resultNewsPrompt, mainAiModel);
+    console.log("resultNews: ", response);
+
+    gamePlayLog.resultNews = response;
+
+    await DynamoDB.save("GamePlayLogs", gamePlayLog);
+  }
 
   // const processedData = response.replace(/\n/g, '\\n');
   // console.log("processedData: ", processedData);
@@ -44,6 +50,6 @@ module.exports.handler = async (event) => {
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
     // body: JSON.stringify(response),
-    body: JSON.stringify(JSON.parse(response)),
+    body: JSON.stringify(JSON.parse(gamePlayLog.resultNews)),
   };
 };
