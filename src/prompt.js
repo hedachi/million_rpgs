@@ -3,8 +3,7 @@ const chara_data = require('./charas.json');
 const SETTINGS_6 = `# 世界設定
 くだもん諸島は、果物と動物が合体した「くだもん」たちが暮らす島々。人間はいない。
 くだもん達は小学生ぐらいの知能レベルを持ち、話すことができる。
-くだもん達はのんびりしており、移り気で、やろうとしていたことをすぐにやめてしまう。
-明るい感じのやる気のなさで「あ、忘れ物した！まあいいか、また明日やろう！」みたいな感じ
+くだもん達は適当で、それほどやる気はないが、性格は明るく、「あ、間違えちゃった。まあいいか、また明日やろう！」みたいな感じ
 `;
 
 const background_images = `1:海が見える砂浜（くだもん諸島のデフォルト背景画像）
@@ -81,7 +80,7 @@ return prompt;
 const story_script_example = (situation) => {
 
   if (situation !== "gameover") {
-    return `# story scriptの出力例
+    return `# story scriptの出力フォーマット参考事例
 [change_bg:6]
 僕らはジャングルリン諸島の森にやってきた。
 石川「よっしゃ！森に来たぞ！」
@@ -119,12 +118,12 @@ const story_script_example = (situation) => {
 
 const gameStartPrompt = (game, gameDetails) => `${active_settings}
 
-${story_script_example("start")}
-
 # ゲーム設定
 ${gameDetails}
 
 ${game_prompt("start")}
+
+${story_script_example("start")}
 
 # 出力に関する注意
 出力には、story script「だけ」を記述してください。
