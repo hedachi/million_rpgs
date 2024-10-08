@@ -1,12 +1,14 @@
 const AWS = require('aws-sdk');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+AWS.config.logger = console;
 
 module.exports.handler = async (event) => {
+
   try {
     const queryParams = event.queryStringParameters;
 
-    if (!queryParams.gameId) {
+    if (!queryParams.gameId && !queryParams.gamePlayLogId) {
       return {
         statusCode: 400,
         headers: {
@@ -15,12 +17,24 @@ module.exports.handler = async (event) => {
           "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
         },
         body: JSON.stringify({
-          error: "gameIdがありません！！！",
+          error: `gameId: ${gameId} or gamePlayLogId: ${gamePlayLogId} が必須です`,
         }),
       };
     }
 
-    const gameId = parseInt(queryParams.gameId);
+    let gameId = queryParams.gameId ? parseInt(queryParams.gameId) : null;
+
+    if (!gameId) {
+      const params = {
+        TableName: `RPG_GamePlayLogs-${process.env.STAGE}`, //
+        Key: {
+          gamePlayLogId: parseInt(queryParams.gamePlayLogId), // 取得したいアイテムのキー
+        },
+      };
+      gamePlayLog = (await dynamodb.get(params).promise()).Item;
+
+      gameId = gamePlayLog.gameId;
+    }
 
     // getメソッドのパラメータを設定
     const params = {
@@ -45,7 +59,8 @@ module.exports.handler = async (event) => {
     };
   }
   catch (error) {
-    console.error("Error getting game:", error);
+    console.error("Error:", error);
+    console.error("error.stack: ", error.stack);
     throw error;
   }
 };
