@@ -67,7 +67,13 @@ module.exports.handler = async (event) => {
       gamePlayLog.playerActions = [];
     }
     gamePlayLog.playerActions.push(playerAction);
-  
+    const game = await dynamodb.get({
+      TableName: `RPG_Games-${process.env.STAGE}`,
+      Key: {
+        gameId: gamePlayLog.gameId,
+      },
+    }).promise();
+    console.log("game: ", game);
     //scriptIndexまでのscriptを取得
     const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
     const splitScripts = TextUtils.splitTexts(lastScripts);
@@ -81,7 +87,31 @@ module.exports.handler = async (event) => {
     }
     else {
       const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, gameDetail.Item.gameDetails);
-      await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithPlayerAction);
+      const thisTurnStoryScript = await GamePlayLogGenerator.generate(gamePlayLog, progressWithPlayerAction);
+
+      const gameClearCheckPrompt = Prompt.gameClearCheck(game, thisTurnStoryScript, gamePlayLog, gameDetail.Item.gameDetails);
+      const result = await LLM.generate("ゲームクリアチェック", gameClearCheckPrompt);
+      console.log("result: ", result);
+      const resultJson = JSON.parse(result);
+      if (resultJson.clearLineNumberInStoryScript >= 0) {
+        console.log("if (resultJson.clearLineNumberInStoryScript >= 0)");
+        //clearLineNumberInStoryScriptまでのscriptを取得
+        const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
+        console.log("lastScripts: ", lastScripts);
+        const splitScripts = TextUtils.splitTexts(lastScripts);
+        console.log("splitScripts: ", splitScripts);
+        const slicedScript = splitScripts.slice(0, resultJson.clearLineNumberInStoryScript + 1);
+        //最後が[choices:...]の場合、それを削除
+        if (slicedScript[slicedScript.length - 1].startsWith("[choices:")) {
+          slicedScript.pop();
+        }
+        slicedScript.push("[gameclear]");
+        console.log("slicedScript: ", slicedScript);
+        const script = slicedScript.join("\n");
+        console.log("script: ", script);
+        gamePlayLog.stories[gamePlayLog.stories.length - 1] = script;
+      }
+      await DynamoDB.save("GamePlayLogs", gamePlayLog);
     }
   }
 

@@ -30,7 +30,7 @@ module.exports.handler = async (event) => {
 
   const mainAiModel = LLM.CLAUDE_BEST_MODEL;
   const resultNewsPrompt = Prompt.newsPrompt(gameDetail, gamePlayLog);
-  const response = await LLM.generate(resultNewsPrompt, mainAiModel);
+  const response = await LLM.generate("ゲーム終了", resultNewsPrompt, mainAiModel);
   console.log("resultNews: ", response);
 
   // const processedData = response.replace(/\n/g, '\\n');

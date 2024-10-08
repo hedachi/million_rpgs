@@ -46,12 +46,27 @@ class GamePlayLogGenerator {
     //   }
     // });
 
-    await LLM.generate(prompt, mainAiModel, (text) => {
+    await LLM.generate("ゲームプレイ", prompt, mainAiModel, (text) => {
       response += text;
     });
     gamePlayLog.stories[nextStoryIndex] = response;
     gamePlayLog.generateFinished = true;
     await DynamoDB.save("GamePlayLogs", gamePlayLog);
+
+    return response;
+  }
+
+  static async generate(gamePlayLog, prompt) {
+    const mainAiModel = LLM.CLAUDE_BEST_MODEL;
+    if (gamePlayLog.stories == null) {
+      gamePlayLog.stories = [];
+    }
+    const nextStoryIndex = gamePlayLog.stories.length;
+    const response = await LLM.generate("ゲームプレイ", prompt, mainAiModel);
+    gamePlayLog.stories[nextStoryIndex] = response;
+    gamePlayLog.generateFinished = true;
+
+    return response;
   }
 }
 

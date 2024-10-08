@@ -10,7 +10,7 @@ class DynamoDB {
     };
 
     try {
-      if (!noLog) console.log(`${tableName} にこのデータを保存します: `, params);
+      // if (!noLog) console.log(`${tableName} にこのデータを保存します: `, params);
       await dynamodb.put(params).promise();
       console.log(`${tableName} への保存成功`);
     } catch (error) {

@@ -4,15 +4,8 @@ const { log } = require("console");
 class LLM {
   static CLAUDE_BEST_MODEL = "claude-3-5-sonnet-20240620";
 
-  static async generate(prompt, model = CLAUDE_BEST_MODEL, streamingCallback = null) {
-    console.log("################################################################################################################################");
-    console.log("####################################################### prompt start ###########################################################");
-    console.log("################################################################################################################################");
-    console.log("prompt: " + prompt);
-    console.log("################################################################################################################################");
-    console.log("####################################################### prompt end #############################################################");
-    console.log("################################################################################################################################");
-
+  static async generate(purpose, prompt, model = LLM.CLAUDE_BEST_MODEL, streamingCallback = null) {
+    console.log("LLM#generate");
     const anthropic = new Anthropic({
       apiKey: process.env["ANTHROPIC_API_KEY"]
     });
@@ -50,20 +43,20 @@ class LLM {
     const response = message.content[0].text;
     //logs/prompt/以下にpromptを保存
     if (process.env.STAGE === "dev") {
-      this.saveLog(prompt, response);
+      this.saveLog(purpose, prompt, response);
     }
 
     return response;
   }
 
-  static saveLog(prompt, response) {
+  static saveLog(purpose, prompt, response) {
     const fs = require('fs');
     const path = require('path');
     const promptDir = path.join(__dirname, "../logs/llm");
     if (!fs.existsSync(promptDir)) {
       fs.mkdirSync(promptDir, { recursive: true });
     }
-    const promptFile = path.join(promptDir, new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).replace(/[/\s:]/g, "-") + ".txt");
+    const promptFile = path.join(promptDir, new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).replace(/[/\s:]/g, "-") + "_" + purpose + ".txt");
     // const promptFile = path.join(promptDir, new Date().toISOString().replace(/:/g, "-") + ".txt");
     const logContent = prompt + "\n======================================================================\n" + response;
     fs.writeFileSync(promptFile, logContent);

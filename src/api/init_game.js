@@ -10,23 +10,24 @@ async function delay(ms) {
 }
 
 module.exports.handler = async (event) => {
-  const rpgPrompt = event?.queryStringParameters?.prompt;
-  const language = event?.queryStringParameters?.language;
   const randomInt = Math.floor(Math.random() * 9000) + 1000;
   const gameId = parseInt(new Date().getTime() + randomInt.toString());
   let gameDetails = null;
+  let game = null;
 
   try {
-    const game = {
+    game = {
       gameId: parseInt(gameId),
-      prompt: rpgPrompt,
-      language: language,
+      prompt: event?.queryStringParameters?.prompt,
+      language: event?.queryStringParameters?.language,
+      clearCriteria: event?.queryStringParameters?.clearCriteria,
+      creator: event?.queryStringParameters?.creator,
     };
     await DynamoDB.save("Games", game);
 
     const mainAiModel = LLM.CLAUDE_BEST_MODEL;
-    const gameDetailsGeneratePrompt = Prompt.gameDetailsGeneratePrompt(rpgPrompt);
-    const response = await LLM.generate(gameDetailsGeneratePrompt, mainAiModel);
+    const gameDetailsGeneratePrompt = Prompt.gameDetailsGeneratePrompt(game);
+    const response = await LLM.generate("ゲーム詳細の生成", gameDetailsGeneratePrompt, mainAiModel);
     gameDetails = {
       gameId: gameId,
       gameDetails: response,
@@ -45,7 +46,7 @@ module.exports.handler = async (event) => {
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
     },
     body: JSON.stringify({
-      message: `"${rpgPrompt}"のシナリオを作成しました: ${new Date().
+      message: `"${game?.prompt}"のシナリオを作成しました: ${new Date().
       toLocaleString('ja-JP')}`,
       gameId: gameId,
       scenario: JSON.parse(gameDetails.gameDetails),
