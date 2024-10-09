@@ -21,6 +21,7 @@ module.exports.handler = async (event) => {
       prompt: event?.queryStringParameters?.prompt,
       language: event?.queryStringParameters?.language,
       clearCriteria: event?.queryStringParameters?.clearCriteria,
+      afterClearSettings: event?.queryStringParameters?.afterClearSettings,
       creator: event?.queryStringParameters?.creator,
     };
     await DynamoDB.save("Games", game);

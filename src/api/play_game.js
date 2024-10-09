@@ -67,12 +67,12 @@ module.exports.handler = async (event) => {
       gamePlayLog.playerActions = [];
     }
     gamePlayLog.playerActions.push(playerAction);
-    const game = await dynamodb.get({
+    const game = (await dynamodb.get({
       TableName: `RPG_Games-${process.env.STAGE}`,
       Key: {
         gameId: gamePlayLog.gameId,
       },
-    }).promise();
+    }).promise()).Item;
     console.log("game: ", game);
     //scriptIndexまでのscriptを取得
     const lastScripts = gamePlayLog.stories[gamePlayLog.stories.length - 1];
@@ -82,7 +82,7 @@ module.exports.handler = async (event) => {
     await DynamoDB.save("GamePlayLogs", gamePlayLog);
     
     if (gameEndReason) {
-      const progressWithGameEndReason = Prompt.scriptToGameEnd(gamePlayLog, gameEndReason, gameDetail.Item.gameDetails);
+      const progressWithGameEndReason = Prompt.scriptToGameEnd(game, gamePlayLog, gameEndReason, gameDetail.Item.gameDetails);
       await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
     }
     else {
@@ -110,6 +110,7 @@ module.exports.handler = async (event) => {
         const script = slicedScript.join("\n");
         console.log("script: ", script);
         gamePlayLog.stories[gamePlayLog.stories.length - 1] = script;
+        gamePlayLog.isCleared = true;
       }
       await DynamoDB.save("GamePlayLogs", gamePlayLog);
     }

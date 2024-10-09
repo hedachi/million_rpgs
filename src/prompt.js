@@ -31,13 +31,13 @@ ${background_images}
 エフェクトを表示
 
 `
-// if (situation !== "gameover" && situation !== "start") {
+// if (situation !== "game_over" && situation !== "start") {
 // prompt += `
 // [troubled:(trouble_description)]
 // トラブルが起きたらこのコマンドを出力
 // `
 // }
-if (situation !== "gameover") {
+if (situation !== "game_over") {
 prompt += `
 [choices:(option1|option2|option3)]
 トラブルが起きなかったら、このコマンドを最後に出力
@@ -64,11 +64,11 @@ commandも記述する
 5〜10行で記述する
 `;
 
-// if (situation !== "gameover" && situation !== "start") {
+// if (situation !== "game_over" && situation !== "start") {
 //   prompt += `
 // ほんのちょっとでもトラブルがあったら[troubled]コマンドを出力
 // `}
-if (situation !== "gameover") {
+if (situation !== "game_over") {
 prompt += `
 最後は、プレイヤーへの選択肢を3つ提示する
 選択肢のうち1つか2つは、キャラクターの設定を踏まえて、トラブルになりそうなものにする
@@ -79,7 +79,7 @@ return prompt;
 
 const story_script_example = (situation) => {
 
-  if (situation !== "gameover") {
+  if (situation !== "game_over") {
     return `# story scriptの出力フォーマット参考事例
 [change_bg:6]
 僕らはジャングルリン諸島の森にやってきた。
@@ -92,7 +92,7 @@ const story_script_example = (situation) => {
 キャサリン「もしかして、恭子！？」
 [choices:木に登る|念のため逃げる|声をかける]`
   } else {
-    return `# story scriptの出力例
+    return `# story scriptの出力フォーマット参考事例
 石川「ふぅ...やっと森に着いたぞ」
 キャサリン「恭子の匂いがするわ。この辺りかもしれないわね」
 スイートポテト「よーし！探すぞー！」
@@ -168,19 +168,19 @@ ${thisTurnStoryScript}
 }
 
 # クリア条件
-${game.Item.clearCriteria}
+${game.clearCriteria}
 
 # 出力の注意
 出力フォーマットに従ったJSONのみを出力してください`;
 
-const scriptToGameEnd = (gamePlayLog, gameEndReason, gameDetails) => `${active_settings}
+const scriptToGameEnd = (game, gamePlayLog, gameEndReason, gameDetails) => `${active_settings}
 
 # ゲーム設定
 ${gameDetails}
 
-${game_prompt("gameover")}
+${game_prompt("game_over")}
 
-${story_script_example("gameover")}
+${story_script_example("game_over")}
 
 # ここまでのstory script
 ${gamePlayLog.stories.join('\n')}
@@ -189,9 +189,12 @@ ${gamePlayLog.stories.join('\n')}
 出力には、story script「だけ」を記述してください。
 
 # ゲーム終了の理由
-${gameEndReason}
+${gamePlayLog.isCleared ? "ゲームをクリアしたため" : gameEndReason}
 
-# 物語の最後までのstory script（ゲーム終了の理由に従って即座に物語を終わらせてください）
+${gamePlayLog.isCleared ? "# ゲームクリアによって公開された追加情報/エピローグ" : ""}
+${gamePlayLog.isCleared ? game.afterClearSettings : ""}
+
+# 物語の最後までのstory script（ゲーム終了の理由に従って物語を終わらせてください）
 `;
 
 const gameDetailsGeneratePrompt = (game) => `${active_settings}
@@ -218,7 +221,6 @@ ${background_images}
     {
       "name" : (場所の名前),
       "description" : (どういった場所か。どういうイベントが起きるか),
-      "clear_requirement" : (場所のクリア条件),
       "background_image_number" : (背景画像の番号)
     }
   ],
