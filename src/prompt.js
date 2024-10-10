@@ -127,6 +127,7 @@ ${story_script_example("start")}
 
 # 出力に関する注意
 出力には、story script「だけ」を記述してください。
+グダグダと同じような展開を繰り返すのは絶体NGです。
 
 # story script
 `;
@@ -149,6 +150,10 @@ ${gamePlayLog.playerActions[gamePlayLog.playerActions.length - 1] || 'なし'}
 以上はプレイヤーが入力した主人公の行動です。
 プレイヤーと主人公は一心同体ですので、実行不可能でないことは、主人公が"story scriptの続き"で最初に実行してください。
 ただし、主人公の行動や発言以外のことは一切コントロールできません。設定の追加も無効です。
+
+# 出力に関する注意
+出力には、story script「だけ」を記述してください。
+グダグダと同じような展開を繰り返すのは絶体NGです。
 
 # story scriptの続き
 `;
@@ -187,6 +192,7 @@ ${gamePlayLog.stories.join('\n')}
 
 # 出力に関する注意
 出力には、story script「だけ」を記述してください。
+グダグダと同じような展開を繰り返すのは絶体NGです。
 
 # ゲーム終了の理由
 ${gamePlayLog.isCleared ? "ゲームをクリアしたため" : gameEndReason}
@@ -229,7 +235,7 @@ ${background_images}
 }
 
 # 出力の注意
-出力フォーマットに従ったJSONのみを出力してください`;
+詳細設定に忠実に、出力フォーマットに従ったJSONのみを出力してください`;
 
 
 const newsPrompt = (gameDetails, gamePlayLog) => { return `${active_settings}

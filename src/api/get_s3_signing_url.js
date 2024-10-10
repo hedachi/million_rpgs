@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     const fileType = event.queryStringParameters.fileType; // クライアントからファイルタイプを受け取る
 
     const params = {
-        Bucket: 'kudamon-island', // S3バケット名
+        Bucket: `kudamon-island-${process.env.STAGE}`, // S3バケット名
         Key: fileName,                 // S3に保存するファイル名
         Expires: 60,                   // URLの有効期限（秒）
         ContentType: fileType          // ファイルのコンテンツタイプ
