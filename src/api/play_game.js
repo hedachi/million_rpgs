@@ -5,6 +5,7 @@ const Prompt = require('../prompt');
 const AWS = require('aws-sdk');
 const TextUtils = require('../text_utils');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
+const Common = require('../common');
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
@@ -118,11 +119,7 @@ module.exports.handler = async (event) => {
 
   return {
     statusCode: 200,
-    headers: {
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Origin": '*',
-      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-    },
+    headers: Common.DEFAULT_HEADERS,
     body: JSON.stringify(gamePlayLog),
   };
 };

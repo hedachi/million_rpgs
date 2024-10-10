@@ -4,6 +4,7 @@ const Prompt = require('../prompt');
 // const axios = require('axios');
 // const AWS = require('aws-sdk');
 // require('aws-sdk/lib/maintenance_mode_message').suppress = true;
+const Common = require('../common');
 
 async function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -41,11 +42,7 @@ module.exports.handler = async (event) => {
   }
   return {
     statusCode: 200,
-    headers: {
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Origin": '*',
-      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-    },
+    headers: Common.DEFAULT_HEADERS,
     body: JSON.stringify({
       message: `"${game?.prompt}"のシナリオを作成しました: ${new Date().
       toLocaleString('ja-JP')}`,

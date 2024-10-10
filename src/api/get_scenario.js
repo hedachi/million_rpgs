@@ -2,6 +2,7 @@ const AWS = require('aws-sdk');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 AWS.config.logger = console;
+const Common = require('../common');
 
 module.exports.handler = async (event) => {
 
@@ -11,11 +12,7 @@ module.exports.handler = async (event) => {
     if (!queryParams.gameId && !queryParams.gamePlayLogId) {
       return {
         statusCode: 400,
-        headers: {
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Origin": '*',
-          "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
+        headers: Common.DEFAULT_HEADERS,
         body: JSON.stringify({
           error: `gameId: ${gameId} or gamePlayLogId: ${gamePlayLogId} が必須です`,
         }),
@@ -48,11 +45,7 @@ module.exports.handler = async (event) => {
     const data = await dynamodb.get(params).promise();
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Origin": '*',
-        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-      },
+      headers: Common.DEFAULT_HEADERS,
       body: JSON.stringify({
         gameId: gameId,
         scenario: JSON.parse(data.Item.gameDetails),

@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+const Common = require('../common');
 
 module.exports.handler = async (event) => {
   try {
@@ -9,11 +10,7 @@ module.exports.handler = async (event) => {
     if (!queryParams.gamePlayLogId) {
       return {
         statusCode: 400,
-        headers: {
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Origin": '*',
-          "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
+        headers: Common.DEFAULT_HEADERS,
         body: JSON.stringify({
           error: "gamePlayLogIdがありません！！！",
         }),
@@ -37,11 +34,7 @@ module.exports.handler = async (event) => {
     // }
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Origin": '*',
-        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-      },
+      headers: Common.DEFAULT_HEADERS,
       body: JSON.stringify({
         gamePlayLog: data.Item,
       }),

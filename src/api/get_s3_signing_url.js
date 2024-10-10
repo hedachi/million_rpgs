@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
+const Common = require('../common');
 
 exports.handler = async (event) => {
     const fileName = event.queryStringParameters.fileName; // クライアントからファイル名を受け取る
@@ -16,21 +17,13 @@ exports.handler = async (event) => {
         const uploadUrl = await s3.getSignedUrlPromise('putObject', params);
         return {
             statusCode: 200,
-            headers: {
-              "Access-Control-Allow-Headers": "Content-Type",
-              "Access-Control-Allow-Origin": '*',
-              "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-            },
+            headers: Common.DEFAULT_HEADERS,
             body: uploadUrl
         };
     } catch (err) {
         return {
             statusCode: 500,
-            headers: {
-              "Access-Control-Allow-Headers": "Content-Type",
-              "Access-Control-Allow-Origin": '*',
-              "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-            },
+            headers: Common.DEFAULT_HEADERS,
             body: JSON.stringify({ error: 'Error generating upload URL' })
         };
     }
