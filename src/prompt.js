@@ -178,6 +178,30 @@ ${game.clearCriteria}
 # 出力の注意
 出力フォーマットに従ったJSONのみを出力してください`;
 
+const isConsistent = (generatedText, game) => `${active_settings}
+
+# クリア条件
+${game.clearCriteria}
+
+# クリア後に公開可能な情報/エピローグ
+${game.afterClearSettings}
+
+# ゲーム設定
+${generatedText}
+
+# 出力JSONフォーマット
+()内に値を入れてください
+{
+  "isConsistent" : (矛盾していない場合はtrue、矛盾している場合はfalse),
+  "reason" : (矛盾している場合、どの部分が矛盾しているか)
+}
+
+# 出力してほしいこと
+「ゲーム設定」を作成してもらいました。
+「ゲーム設定」が、「クリア条件」と「クリア後に公開可能な情報/エピローグ」と矛盾がないことを確認してください。
+矛盾がない場合はtrue、矛盾がある場合はfalseを出力してください。
+出力フォーマットに従ったJSONのみを出力してください。`;
+
 const scriptToGameEnd = (game, gamePlayLog, gameEndReason, gameDetails) => `${active_settings}
 
 # ゲーム設定
@@ -276,4 +300,5 @@ module.exports = {
   gameDetailsGeneratePrompt: gameDetailsGeneratePrompt,
   newsPrompt: newsPrompt,
   gameClearCheck: gameClearCheck,
+  isConsistent: isConsistent,
 }
