@@ -178,7 +178,7 @@ ${game.clearCriteria}
 # 出力の注意
 出力フォーマットに従ったJSONのみを出力してください`;
 
-const isConsistent = (generatedText, game) => `${active_settings}
+const isConsistentAndClearable = (generatedText, game) => `${active_settings}
 
 # クリア条件
 ${game.clearCriteria}
@@ -186,20 +186,22 @@ ${game.clearCriteria}
 # クリア後に公開可能な情報/エピローグ
 ${game.afterClearSettings}
 
-# ゲーム設定
+# コンテンツ
 ${generatedText}
 
 # 出力JSONフォーマット
 ()内に値を入れてください
 {
   "isConsistent" : (矛盾していない場合はtrue、矛盾している場合はfalse),
-  "reason" : (矛盾している場合、どの部分が矛盾しているか)
+  "isInconsistentContent": (矛盾している場合は、コンテンツの問題箇所を記述),
+  "isClearable" : (クリア条件が今後も達成不可能になる内容の場合はfalse、そうでなければtrue),
+  "isNotClearableContent": (クリア条件が達成不可能な場合は、コンテンツの問題箇所を記述)
 }
 
 # 出力してほしいこと
-「ゲーム設定」を作成してもらいました。
-「ゲーム設定」が、「クリア条件」と「クリア後に公開可能な情報/エピローグ」と矛盾がないことを確認してください。
-矛盾がない場合はtrue、矛盾がある場合はfalseを出力してください。
+「コンテンツ」を作成してもらいました。
+「コンテンツ」が「クリア後に公開可能な情報/エピローグ」と矛盾しない場合は、isConsistentにtrueを出力してください。
+また、「コンテンツ」に「クリア条件」を今後達成できなくなる設定が入っていなければ、isClearableにtrueを出力してください。
 出力フォーマットに従ったJSONのみを出力してください。`;
 
 const scriptToGameEnd = (game, gamePlayLog, gameEndReason, gameDetails) => `${active_settings}
@@ -300,5 +302,5 @@ module.exports = {
   gameDetailsGeneratePrompt: gameDetailsGeneratePrompt,
   newsPrompt: newsPrompt,
   gameClearCheck: gameClearCheck,
-  isConsistent: isConsistent,
+  isConsistentAndClearable: isConsistentAndClearable,
 }

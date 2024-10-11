@@ -33,7 +33,7 @@ module.exports.handler = async (event) => {
     const generationFunction = async () => {
       return await LLM.generate("ゲーム詳細の生成", prompt, mainAiModel);
     }
-    const consistentGameDetails = await generateConsistentContent(game, mainAiModel, generationFunction);
+    const consistentGameDetails = await Common.generateConsistentContent(game, mainAiModel, generationFunction);
 
     gameDetails = {
       gameId: gameId,
@@ -56,33 +56,3 @@ module.exports.handler = async (event) => {
   };
 };
 
-async function generateConsistentContent(game, mainAiModel, generationFunction, maxAttempts = 3) {
-  let isConsistent = false;
-  let attempt = 0;
-  let response;
-
-  while (!isConsistent && attempt < maxAttempts) {
-      try {
-          // ゲーム詳細の生成
-          response = await generationFunction();
-          
-          // 矛盾チェック
-          const isConsistentResponse = await LLM.generate("矛盾チェック", Prompt.isConsistent(response, game), mainAiModel);
-          console.log("isConsistentResponse:", isConsistentResponse);
-          
-          // レスポンスのパース
-          isConsistent = JSON.parse(isConsistentResponse).isConsistent;
-          
-          if (!isConsistent) {
-              console.log(`Attempt ${attempt + 1}: 一貫性がありません。再試行します。`);
-          }
-          
-          attempt++;
-      } catch (error) {
-          console.error("エラーが発生しました:", error);
-          break; // エラーが発生した場合はループを抜ける
-      }
-  }
-
-  return response;
-}

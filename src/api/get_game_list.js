@@ -26,7 +26,10 @@ module.exports.handler = async (event) => {
     games = games.map(game => {
       const detail = details.find(detail => detail.gameId === game.gameId);
       //game.merge(detail);
-      const gameDetail = JSON.parse(detail.gameDetails);
+      let gameDetail = {};
+      if (detail) {
+        gameDetail = JSON.parse(detail.gameDetails);
+      }
       gameDetail.places = null;
       gameDetail.playTime = Math.floor(Math.random() * 1000);
       //最速くんか最速さんかをランダムに決める

@@ -1,5 +1,6 @@
 const DynamoDB = require('./dynamo_db');
 const LLM = require("../llm");
+const Common = require('../common');
 
 const saveLogsToFile = false;
 
@@ -9,7 +10,7 @@ if (saveLogsToFile) {
 }
 
 class GamePlayLogGenerator {
-  static async generateAndSaveViaStream(gamePlayLog, prompt) {
+  static async generateAndSetToGamePlayLog(game, gamePlayLog, prompt) {
     const mainAiModel = LLM.CLAUDE_BEST_MODEL;
     let response = "";
     let lastSavedResponseBreakLength = 0;
@@ -46,28 +47,30 @@ class GamePlayLogGenerator {
     //   }
     // });
 
-    await LLM.generate("ゲームプレイ", prompt, mainAiModel, (text) => {
-      response += text;
-    });
-    gamePlayLog.stories[nextStoryIndex] = response;
-    gamePlayLog.generateFinished = true;
-    await DynamoDB.save("GamePlayLogs", gamePlayLog);
-
-    return response;
-  }
-
-  static async generate(gamePlayLog, prompt) {
-    const mainAiModel = LLM.CLAUDE_BEST_MODEL;
-    if (gamePlayLog.stories == null) {
-      gamePlayLog.stories = [];
+    const generationFunction = async () => {
+      return await LLM.generate("ゲームプレイ", prompt, mainAiModel);
     }
-    const nextStoryIndex = gamePlayLog.stories.length;
-    const response = await LLM.generate("ゲームプレイ", prompt, mainAiModel);
-    gamePlayLog.stories[nextStoryIndex] = response;
+    const consistentContent = await Common.generateConsistentContent(game, mainAiModel, generationFunction);
+
+    gamePlayLog.stories[nextStoryIndex] = consistentContent;
     gamePlayLog.generateFinished = true;
 
-    return response;
+    return consistentContent;
   }
+
+  //2024.10.11 start_gameで使われていたが、作成時に自動開始しなくしたので現在は使っていない
+  // static async generate(gamePlayLog, prompt) {
+  //   const mainAiModel = LLM.CLAUDE_BEST_MODEL;
+  //   if (gamePlayLog.stories == null) {
+  //     gamePlayLog.stories = [];
+  //   }
+  //   const nextStoryIndex = gamePlayLog.stories.length;
+  //   const response = await LLM.generate("ゲームプレイ", prompt, mainAiModel);
+  //   gamePlayLog.stories[nextStoryIndex] = response;
+  //   gamePlayLog.generateFinished = true;
+
+  //   return response;
+  // }
 }
 
 module.exports = GamePlayLogGenerator;

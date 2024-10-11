@@ -47,7 +47,8 @@ module.exports.handler = async (event) => {
       playerActions: [],
     };
     const gameStartPrompt = Prompt.gameStartPrompt(game.Item, gameDetail.Item.gameDetails);
-    await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, gameStartPrompt);
+    await GamePlayLogGenerator.generateAndSetToGamePlayLog(game,gamePlayLog, gameStartPrompt);
+    await DynamoDB.save("GamePlayLogs", gamePlayLog);
   }
   else {
     const params = {
@@ -84,11 +85,12 @@ module.exports.handler = async (event) => {
     
     if (gameEndReason) {
       const progressWithGameEndReason = Prompt.scriptToGameEnd(game, gamePlayLog, gameEndReason, gameDetail.Item.gameDetails);
-      await GamePlayLogGenerator.generateAndSaveViaStream(gamePlayLog, progressWithGameEndReason);
+      await GamePlayLogGenerator.generateAndSetToGamePlayLog(game, gamePlayLog, progressWithGameEndReason);
+      await DynamoDB.save("GamePlayLogs", gamePlayLog);
     }
     else {
       const progressWithPlayerAction = Prompt.progressWithPlayerAction(gamePlayLog, gameDetail.Item.gameDetails);
-      const thisTurnStoryScript = await GamePlayLogGenerator.generate(gamePlayLog, progressWithPlayerAction);
+      const thisTurnStoryScript = await GamePlayLogGenerator.generateAndSetToGamePlayLog(game, gamePlayLog, progressWithPlayerAction);
 
       const gameClearCheckPrompt = Prompt.gameClearCheck(game, thisTurnStoryScript, gamePlayLog, gameDetail.Item.gameDetails);
       const result = await LLM.generate("ゲームクリアチェック", gameClearCheckPrompt);
