@@ -3,6 +3,8 @@ const chara_data = require('./charas.json');
 const SETTINGS_6 = `# 世界設定
 くだもん諸島は、果物と動物が合体した「くだもん」たちが暮らす島々。人間はいない。
 くだもん達は小学生ぐらいの知能レベルを持ち、話すことができる。
+くだもん達の体からは、自分の元となった果物が生えてくる。
+明るく元気なコメディ風の物語。
 `;
 
 const background_images = `1:海が見える砂浜（くだもん諸島のデフォルト背景画像）
@@ -14,14 +16,19 @@ const background_images = `1:海が見える砂浜（くだもん諸島のデフ
 
 const active_settings = SETTINGS_6;
 
+const common_prompt =  (game_details) => { return `${active_settings}
 
-const game_prompt = (situation) => {
-  let prompt = `# 使用可能キャラクターのidと設定
+# ゲーム設定
+${game_details}
+
+# 使用可能キャラクターのidと特徴
 ${
   chara_data.map((chara) => `${chara.id}. ${chara.character}`).join('\n')
-}
+}`; }
 
-# commands
+
+const story_script_prompt = (situation) => {
+  let prompt = `# commands
 [change_bg:(number)]
 背景画像を指定番号のものに変更
 ${background_images}
@@ -115,12 +122,9 @@ const story_script_example = (situation) => {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-const gameStartPrompt = (game, gameDetails) => `${active_settings}
+const gameStartPrompt = (game, gameDetails) => `${common_prompt(gameDetails)}
 
-# ゲーム設定
-${gameDetails}
-
-${game_prompt("start")}
+${story_script_prompt("start")}
 
 ${story_script_example("start")}
 
@@ -131,12 +135,9 @@ ${story_script_example("start")}
 # story script
 `;
 
-const progressWithPlayerAction = (gamePlayLog, gameDetails) => `${active_settings}
+const progressWithPlayerAction = (gamePlayLog, gameDetails) => `${common_prompt(gameDetails)}
 
-# ゲーム設定
-${gameDetails}
-
-${game_prompt()}
+${story_script_prompt()}
 
 ${story_script_example()}
 
@@ -157,10 +158,7 @@ ${gamePlayLog.playerActions[gamePlayLog.playerActions.length - 1] || 'なし'}
 # story scriptの続き
 `;
 
-const gameClearCheck = (game, thisTurnStoryScript, gamePlayLog, gameDetails) => `${active_settings}
-
-# ゲーム設定
-${gameDetails}
+const gameClearCheck = (game, thisTurnStoryScript, gamePlayLog, gameDetails) => `${common_prompt(gameDetails)}
 
 # このターンのstory script
 ${thisTurnStoryScript}
@@ -177,7 +175,7 @@ ${game.clearCriteria}
 # 出力の注意
 出力フォーマットに従ったJSONのみを出力してください`;
 
-const isConsistentAndClearable = (generatedText, game) => `${active_settings}
+const isConsistentAndClearable = (generatedText, game) => `${common_prompt("")}
 
 # クリア条件
 ${game.clearCriteria}
@@ -203,12 +201,9 @@ ${generatedText}
 また、「コンテンツ」に「クリア条件」を今後達成できなくなる設定が入っていなければ、isClearableにtrueを出力してください。
 出力フォーマットに従ったJSONのみを出力してください。`;
 
-const scriptToGameEnd = (game, gamePlayLog, gameEndReason, gameDetails) => `${active_settings}
+const scriptToGameEnd = (game, gamePlayLog, gameEndReason, gameDetails) => `${common_prompt(gameDetails)}
 
-# ゲーム設定
-${gameDetails}
-
-${game_prompt("game_over")}
+${story_script_prompt("game_over")}
 
 ${story_script_example("game_over")}
 
@@ -263,15 +258,7 @@ ${background_images}
 詳細設定に忠実に、出力フォーマットに従ったJSONのみを出力してください`;
 
 
-const newsPrompt = (gameDetails, gamePlayLog) => { return `${active_settings}
-
-# ゲーム設定
-${gameDetails}
-
-# 使用可能キャラクターのidと特徴
-${
-  chara_data.map((chara) => `${chara.id}. ${chara.character}`).join('\n')
-}
+const newsPrompt = (gameDetails, gamePlayLog) => { return `${common_prompt(JSON.stringify(gameDetails))}
     
 # ここまでのstory script
 ${gamePlayLog.stories.join('\n')}

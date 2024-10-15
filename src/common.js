@@ -6,6 +6,8 @@ async function generateConsistentContent(game, mainAiModel, generationFunction, 
   let attempt = 0;
   let response;
 
+  console.log("game: " + JSON.stringify(game));
+
   while (!isOk && attempt < maxAttempts) {
       // ゲーム詳細の生成 (LLM)
       response = await generationFunction();

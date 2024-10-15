@@ -22,12 +22,21 @@ module.exports.handler = async (event) => {
   let gamePlayLog = null;
 
   if (gamePlayLogId == null) {
-    const game = await dynamodb.get({
+    const game = (await dynamodb.get({
       TableName: `RPG_Games-${process.env.STAGE}`,
       Key: {
         gameId: gameId,
       },
-    }).promise();
+    }).promise()).Item;
+    if (game == null) {
+      return {
+        statusCode: 400,
+        headers: Common.DEFAULT_HEADERS,
+        body: JSON.stringify({
+          error: `gameId: ${gameId} が見つかりません`,
+        }),
+      };
+    }
     console.log("game: ", game);
     const gameDetail = await dynamodb.get({
       TableName: `RPG_GameDetails-${process.env.STAGE}`,
@@ -41,13 +50,13 @@ module.exports.handler = async (event) => {
     gamePlayLog = {
       gamePlayLogId: gamePlayLogId,
       gameId: gameId,
-      language: game.Item.language,
-      userPrompt: game.Item.prompt,
+      language: game?.language,
+      userPrompt: game?.prompt,
       stories: [],
       playerActions: [],
     };
-    const gameStartPrompt = Prompt.gameStartPrompt(game.Item, gameDetail.Item.gameDetails);
-    await GamePlayLogGenerator.generateAndSetToGamePlayLog(game,gamePlayLog, gameStartPrompt);
+    const gameStartPrompt = Prompt.gameStartPrompt(game, gameDetail.Item.gameDetails);
+    await GamePlayLogGenerator.generateAndSetToGamePlayLog(game, gamePlayLog, gameStartPrompt);
     await DynamoDB.save("GamePlayLogs", gamePlayLog);
   }
   else {
