@@ -33,7 +33,11 @@ module.exports.handler = async (event) => {
     const generationFunction = async () => {
       return await LLM.generate("ゲーム詳細の生成", prompt, mainAiModel);
     }
-    const consistentGameDetails = await Common.generateConsistentContent(game, mainAiModel, generationFunction);
+    let consistentGameDetails = await Common.generateConsistentContent(game, mainAiModel, generationFunction);
+
+    consistentGameDetails = JSON.parse(consistentGameDetails);
+    consistentGameDetails.settings = params.prompt;
+    consistentGameDetails = JSON.stringify(consistentGameDetails);
 
     gameDetails = {
       gameId: gameId,
